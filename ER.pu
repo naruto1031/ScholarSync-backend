@@ -1,0 +1,68 @@
+@startuml Same
+hide circle
+skinparam Linetype ortho
+
+entity "生徒" as student {
+    + 生徒ID <<PK>>
+    --
+    # クラス記号 <<FK>> (クラスへの参照)
+    # 学科ID <<FK>> (学科への参照)
+    生徒名
+    生年月日
+    学籍番号
+    学年
+}
+
+entity "学科" as department {
+    + 学科ID <<PK>>
+    --
+    学科名
+    在籍年数 (年制)
+}
+
+entity "クラス" as class {
+    + クラス記号 <<PK>>
+    --
+    # 担任教師ID <<FK>> (教師への参照)
+    クラス人数
+}
+
+entity "教師" as teacher {
+    + 教師ID <<PK>>
+    --
+    教師名
+    その他情報
+}
+
+entity "教科" as subject {
+    + 教科ID <<PK>>
+    --
+    教科名
+}
+
+entity "担当教師" as teacher_subject {
+    + 担当ID <<PK>>
+    --
+    # 教師ID <<FK>> (教師への参照)
+    # 教科ID <<FK>> (教科への参照)
+}
+
+entity "受講生徒" as student_subject {
+    + 受講ID <<PK>>
+    --
+    # 生徒ID <<FK>> (生徒への参照)
+    # 教科ID <<FK>> (教科への参照)
+}
+
+student ||..o{ student_subject: 受講教科
+subject ||..o{ student_subject: 受講生徒
+
+subject ||..o{ teacher_subject: 担当教師
+teacher ||..o{ teacher_subject: 担当教科
+
+teacher ||..o class: 担任クラス
+
+class ||..o{ student: クラスの生徒
+department ||..o{ student: 所属生徒
+
+@enduml
