@@ -5,7 +5,6 @@ skinparam Linetype ortho
 entity "生徒" as student {
     + 生徒ID <<PK>>
     --
-    # 学校ID <<FK>> (学校の参照)
     # 学科ID <<FK>> (学科への参照)
     # クラス記号 <<FK>> (クラスへの参照)
     生徒名
@@ -93,7 +92,6 @@ teacher ||..o{ class: 担任クラス
 class ||..o{ student: クラスの生徒
 department ||..o{ student: 所属生徒
 
-school ||..|{ student: 所属学校
 school ||..|{ department: 所属学科
 school ||..|{ teacher: 所属学校
 
