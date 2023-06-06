@@ -5,17 +5,25 @@ skinparam Linetype ortho
 entity "生徒" as student {
     + 生徒ID <<PK>>
     --
-    # クラス記号 <<FK>> (クラスへの参照)
+    # 学校ID <<FK>> (学校の参照)
     # 学科ID <<FK>> (学科への参照)
+    # クラス記号 <<FK>> (クラスへの参照)
     生徒名
     生年月日
     学籍番号
     学年
 }
 
+entity "学校" as school {
+    + 学校ID <<PK>>
+    ----
+    学校名
+}
+
 entity "学科" as department {
     + 学科ID <<PK>>
     --
+    # 学校ID <<FK>> (学校の参照)
     学科名
     在籍年数 (年制)
 }
@@ -30,6 +38,7 @@ entity "クラス" as class {
 entity "教師" as teacher {
     + 教師ID <<PK>>
     --
+    # 学校ID <<FK>> (学校の参照)
     教師名
     その他情報
 }
@@ -47,22 +56,50 @@ entity "担当教師" as teacher_subject {
     # 教科ID <<FK>> (教科への参照)
 }
 
-entity "受講生徒" as student_subject {
-    + 受講ID <<PK>>
+entity "課題" as issue {
+    + 課題ID <<PK>>
     --
-    # 生徒ID <<FK>> (生徒への参照)
-    # 教科ID <<FK>> (教科への参照)
+    # 担当ID <<FK>> (担当教師への参照)
+    課題名
+    納期
 }
 
-student ||..o{ student_subject: 受講教科
-subject ||..o{ student_subject: 受講生徒
+entity "課題表紙" as issueCover {
+    + 課題表紙ID <<PK>>
+    --
+    # 課題ID <<FK>> (課題への参照)
+    # 生徒ID <<FK>> (生徒への参照)
+    コメント
+}
+
+entity "課題表紙状態" as issueCoverStatus {
+    + 課題表紙状態ID <<PK>>
+    --
+    # 課題表紙ID <<FK>> (課題表紙への参照)
+    承認フラグ
+    未提出フラグ
+    公欠フラグ
+    免除フラグ
+    再提出フラグ
+    再提出期限
+    再提出コメント
+    状態変更日
+}
 
 subject ||..o{ teacher_subject: 担当教師
 teacher ||..o{ teacher_subject: 担当教科
 
-teacher ||..o class: 担任クラス
-
+teacher ||..o{ class: 担任クラス
 class ||..o{ student: クラスの生徒
 department ||..o{ student: 所属生徒
+
+school ||..|{ student: 所属学校
+school ||..|{ department: 所属学科
+school ||..|{ teacher: 所属学校
+
+teacher_subject ||..o{ issue: 課題設定
+issue ||..o{ issueCover: 課題
+student ||..o{ issueCover: 課題表紙と生徒の関係
+issueCover ||..|{ issueCoverStatus: 課題表紙状態
 
 @enduml
