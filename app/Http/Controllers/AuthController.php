@@ -50,4 +50,11 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
+
+    public function hello()
+    {
+        return response()->json([
+            "greeting" => "hello",
+        ]);
+    }
 }
