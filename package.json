@@ -4,11 +4,12 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-        "prettier": "prettier --write --plugin=@prettier/plugin-php --ignore-path .prettierignore **/*.php"
+		"prettier": "prettier --write --plugin=@prettier/plugin-php --ignore-path .prettierignore **/*.php"
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.21.0",
 		"axios": "^1.1.2",
+		"husky": "^8.0.3",
 		"laravel-vite-plugin": "^0.7.5",
 		"prettier": "^3.1.0",
 		"vite": "^4.0.0"
