@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
@@ -30,7 +31,12 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
-    public function login(Request $request)
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function login(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
             'email' => 'required|email',
@@ -51,7 +57,10 @@ class AuthController extends Controller
         ]);
     }
 
-    public function hello()
+    /**
+     * @return JsonResponse
+     */
+    public function hello(): JsonResponse
     {
         return response()->json([
             "greeting" => "hello",

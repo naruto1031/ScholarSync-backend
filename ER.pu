@@ -1,53 +1,24 @@
-@startuml Same
-hide circle
-skinparam Linetype ortho
+@startuml ScholorSync
 
-'   ①年度をまたいだ管理
-'   ②科目の複数担当
-'   ③教員も学科の概念があるんだけど、
-
-' 　今の状態だと関連が弱いですね。
-'   そもそも学科テーブルを何に使うか？が見えません。
-
-'   年度をまたいだ管理が必要だとして、それは学生に向けてか?
-'   課題表紙を管理するうえで、学科はそもそも必要?
+entity "学科" as department {
+    + 学科ID <<PK>>
+    --
+    学科名
+}
 
 entity "生徒" as student {
     + 生徒ID <<PK>>
     --
-    # 学科ID <<FK>> (学科への参照)
-    # クラス記号 <<FK>> (クラスへの参照)
+    # 学科ID <<FK>>
     生徒名
     生年月日
     学籍番号
     学年
 }
 
-entity "学校" as school {
-    + 学校ID <<PK>>
-    ----
-    学校名
-}
-
-entity "学科" as department {
-    + 学科ID <<PK>>
-    --
-    # 学校ID <<FK>> (学校の参照)
-    学科名
-    在籍年数 (年制)
-}
-
-entity "クラス" as class {
-    + クラス記号 <<PK>>
-    --
-    # 担任教師ID <<FK>> (教師への参照)
-    クラス人数
-}
-
 entity "教師" as teacher {
     + 教師ID <<PK>>
     --
-    # 学校ID <<FK>> (学校の参照)
     教師名
     その他情報
 }
@@ -61,30 +32,32 @@ entity "教科" as subject {
 entity "担当教師" as teacher_subject {
     + 担当ID <<PK>>
     --
-    # 教師ID <<FK>> (教師への参照)
-    # 教科ID <<FK>> (教科への参照)
+    # 教師ID <<FK>>
+    # 教科ID <<FK>>
+    # 学科ID <<FK>>
 }
 
 entity "課題" as issue {
     + 課題ID <<PK>>
     --
-    # 担当ID <<FK>> (担当教師への参照)
+    # 担当ID <<FK>>
     課題名
     納期
+    コメント
 }
 
 entity "課題表紙" as issueCover {
     + 課題表紙ID <<PK>>
     --
-    # 課題ID <<FK>> (課題への参照)
-    # 生徒ID <<FK>> (生徒への参照)
+    # 課題ID <<FK>>
+    # 生徒ID <<FK>>
     コメント
 }
 
 entity "課題表紙状態" as issueCoverStatus {
     + 課題表紙状態ID <<PK>>
     --
-    # 課題表紙ID <<FK>> (課題表紙への参照)
+    # 課題表紙ID <<FK>>
     承認フラグ
     未提出フラグ
     公欠フラグ
@@ -95,19 +68,19 @@ entity "課題表紙状態" as issueCoverStatus {
     状態変更日
 }
 
-subject ||..o{ teacher_subject: 担当教師
-teacher ||..o{ teacher_subject: 担当教科
+' エンティティ間の関係を設定
+department ||--o{ student : 所属生徒
+department ||--o{ teacher_subject : 対象学科
+teacher ||--o{ teacher_subject : 担当教科
+subject ||--o{ teacher_subject : 担当教師
 
-teacher ||..o{ class: 担任クラス
-class ||..o{ student: クラスの生徒
-department ||..o{ student: 所属生徒
+teacher_subject }o--|| issue : 課題設定
+issue ||--o{ issueCover : 対応
+student ||--o{ issueCover : 提出
 
-school ||..|{ department: 所属学科
-school ||..|{ teacher: 所属学校
+issueCover ||--|| issueCoverStatus : 状態
 
-teacher_subject ||..o{ issue: 課題設定
-issue ||..o{ issueCover: 課題
-student ||..o{ issueCover: 課題表紙と生徒の関係
-issueCover ||..|{ issueCoverStatus: 課題表紙状態
+' 線種を直交線に設定
+skinparam Linetype ortho
 
 @enduml

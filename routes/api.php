@@ -19,7 +19,6 @@ Route::post('/register', [AuthController::class, "register"]);
 
 Route::post('/login', [AuthController::class, "login"]);
 
-
 Route::middleware('jwt.verify')->group(function () {
     Route::get('/greeting', [AuthController::class, 'hello']);
 });
