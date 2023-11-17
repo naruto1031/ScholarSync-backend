@@ -10,60 +10,60 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request): JsonResponse
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+	public function register(Request $request): JsonResponse
+	{
+		$validatedData = $request->validate([
+			'name' => 'required|string|max:255',
+			'email' => 'required|string|email|max:255|unique:users',
+			'password' => 'required|string|min:6',
+		]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
+		$user = User::create([
+			'name' => $validatedData['name'],
+			'email' => $validatedData['email'],
+			'password' => Hash::make($validatedData['password']),
+		]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+		$token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
-    }
+		return response()->json([
+			'access_token' => $token,
+			'token_type' => 'Bearer',
+		]);
+	}
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function login(Request $request): JsonResponse
-    {
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+	/**
+	 * @param Request $request
+	 * @return JsonResponse
+	 */
+	public function login(Request $request): JsonResponse
+	{
+		$validatedData = $request->validate([
+			'email' => 'required|email',
+			'password' => 'required',
+		]);
 
-        if (!Auth::attempt($validatedData)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
+		if (!Auth::attempt($validatedData)) {
+			return response()->json(['message' => 'Unauthorized'], 401);
+		}
 
-        $user = User::where('email', $validatedData['email'])->firstOrFail();
+		$user = User::where('email', $validatedData['email'])->firstOrFail();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+		$token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
-    }
+		return response()->json([
+			'access_token' => $token,
+			'token_type' => 'Bearer',
+		]);
+	}
 
-    /**
-     * @return JsonResponse
-     */
-    public function hello(): JsonResponse
-    {
-        return response()->json([
-            "greeting" => "hello",
-        ]);
-    }
+	/**
+	 * @return JsonResponse
+	 */
+	public function hello(): JsonResponse
+	{
+		return response()->json([
+			'greeting' => 'hello',
+		]);
+	}
 }
