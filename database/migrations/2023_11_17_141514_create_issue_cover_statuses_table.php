@@ -20,14 +20,18 @@ return new class extends Migration {
 			$table->boolean('resubmission_flag'); // 再提出フラグ
 			$table->date('resubmission_deadline')->nullable(); // 再提出期限
 			$table->text('resubmission_comment')->nullable(); // 再提出コメント
-			$table->timestamp('status_change_date')->nullable(); // 状態変更日
+			$table->boolean('challenge_flag'); // チャレンジ問題フラグ
+			$table->integer('challenge_max_score')->nullable(); // チャレンジ問題の満点
+			$table->integer('current_score')->nullable(); // 現在の点数
+			$table->boolean('public_flag'); // 公開フラグ
 			$table->timestamps();
 
 			// 外部キー制約
 			$table
 				->foreign('issue_cover_id')
 				->references('issue_cover_id')
-				->on('issue_covers');
+				->on('issue_covers')
+				->onDelete('cascade');
 		});
 	}
 

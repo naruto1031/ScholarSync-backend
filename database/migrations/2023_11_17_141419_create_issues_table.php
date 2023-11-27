@@ -11,18 +11,18 @@ return new class extends Migration {
 	public function up(): void
 	{
 		Schema::create('issues', function (Blueprint $table) {
-			$table->id('issue_id'); // 課題ID
-			$table->unsignedBigInteger('teacher_subject_id'); // 担当ID
-			$table->string('title'); // 課題名
-			$table->date('due_date'); // 納期
-			$table->text('comment')->nullable(); // コメント
+			$table->id('issue_id');
+			$table->unsignedBigInteger('teacher_subject_id');
+			$table->string('name');
+			$table->date('due_date');
+			$table->text('comment')->nullable();
 			$table->timestamps();
 
-			// 外部キー制約
 			$table
 				->foreign('teacher_subject_id')
 				->references('teacher_subject_id')
-				->on('teacher_subjects');
+				->on('teacher_subjects')
+				->onDelete('cascade');
 		});
 	}
 

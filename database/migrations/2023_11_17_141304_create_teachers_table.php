@@ -11,9 +11,9 @@ return new class extends Migration {
 	public function up(): void
 	{
 		Schema::create('teachers', function (Blueprint $table) {
-			$table->id('teacher_id'); // 教師ID
-			$table->string('name'); // 教師名
-			$table->text('additional_info')->nullable(); // その他情報
+			$table->id('teacher_id');
+			$table->string('name');
+			$table->string('email');
 			$table->timestamps();
 		});
 	}

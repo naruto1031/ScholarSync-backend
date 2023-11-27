@@ -4,7 +4,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-		"prettier": "prettier --write --plugin=@prettier/plugin-php --ignore-path .prettierignore **/*.php"
+		"format": "prettier --write --plugin=@prettier/plugin-php --ignore-path .prettierignore **/*.php"
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.21.0",

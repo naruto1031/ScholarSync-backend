@@ -6,21 +6,35 @@ entity "学科" as department {
     学科名
 }
 
+entity "クラス" as school_class {
+    + クラスID <<PK>>
+    --
+    # 学科ID <<FK>>
+    クラス名
+}
+
 entity "生徒" as student {
     + 生徒ID <<PK>>
     --
-    # 学科ID <<FK>>
+    # クラスID <<FK>>
+    メールアドレス
     生徒名
-    生年月日
     学籍番号
-    学年
+    出席番号
 }
 
 entity "教師" as teacher {
     + 教師ID <<PK>>
     --
     教師名
-    その他情報
+    メールアドレス
+}
+
+entity "担任" as class_teacher {
+    + 担任ID <<PK>>
+    --
+    # 教師ID <<FK>>
+    # クラスID <<FK>>
 }
 
 entity "教科" as subject {
@@ -29,12 +43,11 @@ entity "教科" as subject {
     教科名
 }
 
-entity "担当教師" as teacher_subject {
+entity "担当教科" as teacher_subject {
     + 担当ID <<PK>>
     --
     # 教師ID <<FK>>
     # 教科ID <<FK>>
-    # 学科ID <<FK>>
 }
 
 entity "課題" as issue {
@@ -44,6 +57,13 @@ entity "課題" as issue {
     課題名
     納期
     コメント
+}
+
+entity "課題学科" as issue_department {
+    + 課題学科ID <<PK>>
+    --
+    # 課題ID <<FK>>
+    # 学科ID <<FK>>
 }
 
 entity "課題表紙" as issueCover {
@@ -60,22 +80,33 @@ entity "課題表紙状態" as issueCoverStatus {
     # 課題表紙ID <<FK>>
     承認フラグ
     未提出フラグ
+    チャレンジ問題フラグ
+    チャレンジ問題満点
+    チャレンジ問題点数
     公欠フラグ
     免除フラグ
     再提出フラグ
     再提出期限
     再提出コメント
-    状態変更日
 }
 
 ' エンティティ間の関係を設定
-department ||--o{ student : 所属生徒
-department ||--o{ teacher_subject : 対象学科
+department ||--o{ school_class : 含まれるクラス
+department ||--o{ issue_department : 課題に関連
+
+school_class ||--o{ student : 所属生徒
+school_class ||--o{ class_teacher : 担任
+
+teacher ||--o{ class_teacher : 担任
 teacher ||--o{ teacher_subject : 担当教科
+
 subject ||--o{ teacher_subject : 担当教師
 
-teacher_subject }o--|| issue : 課題設定
+teacher_subject ||--o{ issue : 担当する課題
+
+issue ||--o{ issue_department : 関連する学科
 issue ||--o{ issueCover : 対応
+
 student ||--o{ issueCover : 提出
 
 issueCover ||--|| issueCoverStatus : 状態

@@ -14,22 +14,19 @@ return new class extends Migration {
 			$table->id('teacher_subject_id'); // 担当ID
 			$table->unsignedBigInteger('teacher_id'); // 教師ID
 			$table->unsignedBigInteger('subject_id'); // 教科ID
-			$table->unsignedBigInteger('department_id'); // 学科ID
 			$table->timestamps();
 
 			// 外部キー制約
 			$table
 				->foreign('teacher_id')
 				->references('teacher_id')
-				->on('teachers');
+				->on('teachers')
+				->onDelete('cascade');
 			$table
 				->foreign('subject_id')
 				->references('subject_id')
-				->on('subjects');
-			$table
-				->foreign('department_id')
-				->references('department_id')
-				->on('departments');
+				->on('subjects')
+				->onDelete('cascade');
 		});
 	}
 
