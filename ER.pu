@@ -1,93 +1,93 @@
 @startuml ScholorSync
 
 entity "学科" as department {
-    + 学科ID <<PK>>
-    --
-    学科名
+  + 学科ID <<PK>>
+  --
+  学科名
 }
 
 entity "クラス" as school_class {
-    + クラスID <<PK>>
-    --
-    # 学科ID <<FK>>
-    クラス名
+  + クラスID <<PK>>
+  --
+  # 学科ID <<FK>>
+  クラス名
 }
 
 entity "生徒" as student {
-    + 生徒ID <<PK>>
-    --
-    # クラスID <<FK>>
-    メールアドレス
-    生徒名
-    学籍番号
-    出席番号
+  + 生徒ID <<PK>>
+  --
+  # クラスID <<FK>>
+  メールアドレス
+  生徒名
+  学籍番号
+  出席番号
 }
 
 entity "教師" as teacher {
-    + 教師ID <<PK>>
-    --
-    教師名
-    メールアドレス
+  + 教師ID <<PK>>
+  --
+  教師名
+  メールアドレス
 }
 
 entity "担任" as class_teacher {
-    + 担任ID <<PK>>
-    --
-    # 教師ID <<FK>>
-    # クラスID <<FK>>
+  + 担任ID <<PK>>
+  --
+  # 教師ID <<FK>>
+  # クラスID <<FK>>
 }
 
 entity "教科" as subject {
-    + 教科ID <<PK>>
-    --
-    教科名
+  + 教科ID <<PK>>
+  --
+  教科名
 }
 
 entity "担当教科" as teacher_subject {
-    + 担当ID <<PK>>
-    --
-    # 教師ID <<FK>>
-    # 教科ID <<FK>>
+  + 担当ID <<PK>>
+  --
+  # 教師ID <<FK>>
+  # 教科ID <<FK>>
 }
 
 entity "課題" as issue {
-    + 課題ID <<PK>>
-    --
-    # 担当ID <<FK>>
-    課題名
-    納期
-    コメント
+  + 課題ID <<PK>>
+  --
+  # 担当ID <<FK>>
+  課題名
+  納期
+  コメント
 }
 
 entity "課題学科" as issue_department {
-    + 課題学科ID <<PK>>
-    --
-    # 課題ID <<FK>>
-    # 学科ID <<FK>>
+  + 課題学科ID <<PK>>
+  --
+  # 課題ID <<FK>>
+  # 学科ID <<FK>>
 }
 
 entity "課題表紙" as issueCover {
-    + 課題表紙ID <<PK>>
-    --
-    # 課題ID <<FK>>
-    # 生徒ID <<FK>>
-    コメント
+  + 課題表紙ID <<PK>>
+  --
+  # 課題ID <<FK>>
+  # 生徒ID <<FK>>
+  コメント
 }
 
 entity "課題表紙状態" as issueCoverStatus {
-    + 課題表紙状態ID <<PK>>
-    --
-    # 課題表紙ID <<FK>>
-    承認フラグ
-    未提出フラグ
-    チャレンジ問題フラグ
-    チャレンジ問題満点
-    チャレンジ問題点数
-    公欠フラグ
-    免除フラグ
-    再提出フラグ
-    再提出期限
-    再提出コメント
+  + 課題表紙状態ID <<PK>>
+  --
+  # 課題表紙ID <<FK>>
+  承認フラグ
+  未提出フラグ
+  チャレンジ問題フラグ
+  チャレンジ問題満点
+  チャレンジ問題点数
+  公欠フラグ
+  免除フラグ
+  再提出フラグ
+  再提出期限
+  再提出コメント
 }
 
 ' エンティティ間の関係を設定
