@@ -12,6 +12,7 @@ class VerifyAzureJwtMiddleware
 		if (env('APP_ENV') === 'local') {
 			// ローカル環境では、JWTの検証をスキップする
 			$request->attributes->add(['jwt_sub' => 'P-AOoO2LsTgbL3338uNs6ewa3gUUdo']);
+			$request->attributes->add(['user_groups' => ['develop']]);
 			return $next($request);
 		}
 		$token = $request->bearerToken();
@@ -38,6 +39,10 @@ class VerifyAzureJwtMiddleware
 		try {
 			$decode = JWT::decode($token, $publicKey);
 			$request->attributes->add(['jwt_sub' => $decode->sub]);
+
+			if (isset($decode->groups)) {
+				$request->attributes->add(['user_groups' => $decode->groups]);
+			}
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 500);
 		}
