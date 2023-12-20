@@ -12,7 +12,7 @@ return new class extends Migration {
 	{
 		Schema::create('class_teachers', function (Blueprint $table) {
 			$table->id('class_teacher_id');
-			$table->unsignedBigInteger('teacher_id');
+			$table->string('teacher_id');
 			$table->unsignedBigInteger('class_id');
 			$table->timestamps();
 

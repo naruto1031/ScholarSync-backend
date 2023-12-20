@@ -5,7 +5,7 @@ use App\Models\IssueCover;
 
 class IssueCoverSeeder extends Seeder
 {
-	public function run()
+	public function run(): void
 	{
 		IssueCover::factory()
 			->count(50)

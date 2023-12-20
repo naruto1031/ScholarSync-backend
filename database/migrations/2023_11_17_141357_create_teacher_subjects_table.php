@@ -12,7 +12,7 @@ return new class extends Migration {
 	{
 		Schema::create('teacher_subjects', function (Blueprint $table) {
 			$table->id('teacher_subject_id'); // 担当ID
-			$table->unsignedBigInteger('teacher_id'); // 教師ID
+			$table->string('teacher_id'); // 教師ID
 			$table->unsignedBigInteger('subject_id'); // 教科ID
 			$table->timestamps();
 

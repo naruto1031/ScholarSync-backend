@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\TeacherManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,14 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [AuthController::class, 'register']);
-
-Route::post('/login', [AuthController::class, 'login']);
-
 Route::middleware('jwt.verify')->group(function () {
-	Route::get('/greeting', [AuthController::class, 'hello']);
-});
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-	return $request->user();
+	// 教師情報
+	Route::get('/teacher', [TeacherManagementController::class, 'getTeacherList']);
+	Route::put('/teacher', [TeacherManagementController::class, 'updateTeacher']);
+	Route::delete('/teacher', [TeacherManagementController::class, 'deleteTeacher']);
+	Route::post('/teacher/register', [TeacherManagementController::class, 'teacherRegister']);
+	Route::get('/teacher/exists', [TeacherManagementController::class, 'checkTeacherExists']);
 });

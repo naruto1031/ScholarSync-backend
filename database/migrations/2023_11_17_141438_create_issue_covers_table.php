@@ -13,7 +13,7 @@ return new class extends Migration {
 		Schema::create('issue_covers', function (Blueprint $table) {
 			$table->id('issue_cover_id'); // 課題表紙ID
 			$table->unsignedBigInteger('issue_id'); // 課題ID
-			$table->unsignedBigInteger('student_id'); // 生徒ID
+			$table->string('student_id'); // 生徒ID
 			$table->text('comment')->nullable(); // コメント
 			$table->timestamps();
 
