@@ -23,14 +23,6 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::put('/teacher', [TeacherManagementController::class, 'updateTeacher']);
 	Route::delete('/teacher', [TeacherManagementController::class, 'deleteTeacher']);
 	Route::get('/teacher/exists', [TeacherManagementController::class, 'checkTeacherExists']);
-});
-
-Route::middleware(['jwt.verify', 'admin'])->group(function () {
-	// 教科情報
-	Route::post('/subject/register', [SubjectManagementController::class, 'subjectRegister']);
-	Route::get('/subject', [SubjectManagementController::class, 'getSubjectList']);
-	Route::put('/subject/{subject}', [SubjectManagementController::class, 'updateSubject']);
-	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
 
 	// 教師への教科の割り当て
 	Route::post('/subject/assign', [SubjectAssignmentController::class, 'assignSubjectToTeacher']);
@@ -39,4 +31,12 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 		'deleteSubjectAssignment',
 	]);
 	Route::get('/subject/assign', [SubjectAssignmentController::class, 'getSubjectList']);
+});
+
+Route::middleware(['jwt.verify', 'admin'])->group(function () {
+	// 教科情報
+	Route::post('/subject/register', [SubjectManagementController::class, 'subjectRegister']);
+	Route::get('/subject', [SubjectManagementController::class, 'getSubjectList']);
+	Route::put('/subject/{subject}', [SubjectManagementController::class, 'updateSubject']);
+	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
 });
