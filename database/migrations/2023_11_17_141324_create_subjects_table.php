@@ -12,7 +12,7 @@ return new class extends Migration {
 	{
 		Schema::create('subjects', function (Blueprint $table) {
 			$table->id('subject_id'); // 教科ID
-			$table->string('name'); // 教科名
+			$table->string('name')->unique();
 			$table->timestamps();
 		});
 	}

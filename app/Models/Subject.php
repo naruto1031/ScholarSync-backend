@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Subject extends Model
 {
 	use HasFactory;
+	protected $primaryKey = 'subject_id';
+	protected $fillable = ['name'];
+
 	public function teacherSubjects(): HasMany
 	{
 		return $this->hasMany(TeacherSubject::class, 'subject_id');

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TeacherSubject extends Model
 {
 	use HasFactory;
+	protected $primaryKey = 'teacher_subject_id';
+	protected $fillable = ['teacher_id', 'subject_id'];
 
 	public function teacher(): BelongsTo
 	{
@@ -24,5 +26,14 @@ class TeacherSubject extends Model
 	public function issues(): HasMany
 	{
 		return $this->hasMany(Issue::class, 'teacher_subject_id');
+	}
+
+	public function scopeWithSubject($query, $teacher_id)
+	{
+		return $query->where('teacher_id', $teacher_id)->with([
+			'subject' => function ($query) {
+				$query->select('subject_id', 'name');
+			},
+		]);
 	}
 }

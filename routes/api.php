@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TeacherManagementController;
 use App\Http\Controllers\SubjectManagementController;
+use App\Http\Controllers\SubjectAssignmentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,4 +31,12 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 	Route::get('/subject', [SubjectManagementController::class, 'getSubjectList']);
 	Route::put('/subject/{subject}', [SubjectManagementController::class, 'updateSubject']);
 	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
+
+	// 教師への教科の割り当て
+	Route::post('/subject/assign', [SubjectAssignmentController::class, 'assignSubjectToTeacher']);
+	Route::delete('/subject/assign/{teacher_subject}', [
+		SubjectAssignmentController::class,
+		'deleteSubjectAssignment',
+	]);
+	Route::get('/subject/assign', [SubjectAssignmentController::class, 'getSubjectList']);
 });
