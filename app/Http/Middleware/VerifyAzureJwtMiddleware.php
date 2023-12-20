@@ -10,7 +10,8 @@ class VerifyAzureJwtMiddleware
 	public function handle($request, Closure $next, $guard = null)
 	{
 		if (env('APP_ENV') === 'local') {
-			$request->attributes->add(['jwt_sub' => 'P-AOoO2LsTgbL8uNs6wa3gUUdo36QdzcWmbBVFTtXk']);
+			// ローカル環境では、JWTの検証をスキップする
+			$request->attributes->add(['jwt_sub' => 'P-AOoO2LsTgbL3338uNs6ewa3gUUdo']);
 			return $next($request);
 		}
 		$token = $request->bearerToken();

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Teacher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class TeacherManagementController extends Controller
 {
