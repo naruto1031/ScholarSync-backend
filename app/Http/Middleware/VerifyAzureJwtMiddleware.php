@@ -4,12 +4,15 @@ namespace App\Http\Middleware;
 use Closure;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 
 class VerifyAzureJwtMiddleware
 {
 	public function handle($request, Closure $next, $guard = null)
 	{
+		if (env('APP_ENV') === 'local') {
+			$request->attributes->add(['jwt_sub' => 'P-AOoO2LsTgbL8uNs6wa3gUUdo36QdzcWmbBVFTtXk']);
+			return $next($request);
+		}
 		$token = $request->bearerToken();
 
 		if (!$token) {
@@ -32,8 +35,8 @@ class VerifyAzureJwtMiddleware
 
 		$publicKey = $secrets[$kid];
 		try {
-			// Assuming $publicKey is already in the correct format
 			$decode = JWT::decode($token, $publicKey);
+			$request->attributes->add(['jwt_sub' => $decode->sub]);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 500);
 		}
