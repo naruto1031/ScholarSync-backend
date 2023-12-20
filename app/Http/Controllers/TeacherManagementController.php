@@ -21,8 +21,14 @@ class TeacherManagementController extends Controller
 	public function teacherRegister(Request $request): JsonResponse
 	{
 		$validatedData = $this->validateTeacher($request);
+		$teacher_id = $request->attributes->get('jwt_sub');
+
+		if (is_null($teacher_id)) {
+			return response()->json(['message' => 'JWT subject cannot be null'], 400);
+		}
+
 		$teacher = new Teacher([
-			'teacher_id' => $request->attributes->get('jwt_sub'),
+			'teacher_id' => $teacher_id,
 			'name' => $validatedData['name'],
 			'email' => $validatedData['email'],
 		]);
@@ -34,6 +40,11 @@ class TeacherManagementController extends Controller
 	public function checkTeacherExists(Request $request): JsonResponse
 	{
 		$teacher_id = $request->attributes->get('jwt_sub');
+
+		if (is_null($teacher_id)) {
+			return response()->json(['message' => 'JWT subject cannot be null'], 400);
+		}
+
 		$exists = Teacher::where('teacher_id', $teacher_id)->exists();
 
 		return response()->json(['exists' => $exists]);
@@ -48,6 +59,11 @@ class TeacherManagementController extends Controller
 	public function updateTeacher(Request $request): JsonResponse
 	{
 		$teacher_id = $request->attributes->get('jwt_sub');
+
+		if (is_null($teacher_id)) {
+			return response()->json(['message' => 'JWT subject cannot be null'], 400);
+		}
+
 		$teacher = Teacher::find($teacher_id);
 
 		if (!$teacher) {
@@ -63,7 +79,13 @@ class TeacherManagementController extends Controller
 	public function deleteTeacher(Request $request): JsonResponse
 	{
 		$teacher_id = $request->attributes->get('jwt_sub');
+
+		if (is_null($teacher_id)) {
+			return response()->json(['message' => 'JWT subject cannot be null'], 400);
+		}
+
 		$teacher = Teacher::find($teacher_id);
+
 		if (!$teacher) {
 			return response()->json(['message' => 'Teacher not found'], 404);
 		}
