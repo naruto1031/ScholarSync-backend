@@ -10,6 +10,9 @@ class Department extends Model
 {
 	use HasFactory;
 
+	protected $primaryKey = 'department_id';
+	protected $fillable = ['name'];
+
 	public function schoolClasses(): HasMany
 	{
 		return $this->hasMany(SchoolClass::class, 'department_id');

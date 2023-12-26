@@ -3,6 +3,7 @@
 use App\Http\Controllers\TeacherManagementController;
 use App\Http\Controllers\SubjectManagementController;
 use App\Http\Controllers\SubjectAssignmentController;
+use App\Http\Controllers\DepartmentManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,4 +40,19 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 	Route::get('/subject', [SubjectManagementController::class, 'getSubjectList']);
 	Route::put('/subject/{subject}', [SubjectManagementController::class, 'updateSubject']);
 	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
+
+	// 学科情報
+	Route::post('/department/register', [
+		DepartmentManagementController::class,
+		'departmentRegister',
+	]);
+	Route::get('/department', [DepartmentManagementController::class, 'getDepartmentList']);
+	Route::put('/department/{department}', [
+		DepartmentManagementController::class,
+		'updateDepartment',
+	]);
+	Route::delete('/department/{department}', [
+		DepartmentManagementController::class,
+		'deleteDepartment',
+	]);
 });
