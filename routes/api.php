@@ -5,6 +5,7 @@ use App\Http\Controllers\SubjectManagementController;
 use App\Http\Controllers\SubjectAssignmentController;
 use App\Http\Controllers\DepartmentManagementController;
 use App\Http\Controllers\SchoolClassManagementController;
+use App\Http\Controllers\ClassTeacherAssignmentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,14 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 		'deleteSubjectAssignment',
 	]);
 	Route::get('/subject/assign', [SubjectAssignmentController::class, 'getSubjectList']);
+
+	// 教師へのクラスの割り当て
+	Route::post('/class/assign', [ClassTeacherAssignmentController::class, 'assignClassToTeacher']);
+	Route::delete('/class/assign/{class_teacher}', [
+		ClassTeacherAssignmentController::class,
+		'deleteClassTeacherAssignment',
+	]);
+	Route::get('/class/assign', [ClassTeacherAssignmentController::class, 'getClassTeacherList']);
 });
 
 Route::middleware(['jwt.verify', 'admin'])->group(function () {
