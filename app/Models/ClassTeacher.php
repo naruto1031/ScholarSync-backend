@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ClassTeacher extends Model
 {
 	use HasFactory;
+	protected $primaryKey = 'class_teacher_id';
+	protected $fillable = ['class_id', 'teacher_id'];
+
+	public function scopeWithClassAndDepartment($query, $teacher_id)
+	{
+		return $query->where('teacher_id', $teacher_id)->with([
+			'schoolClass' => function ($query) {
+				$query->select('class_id', 'name', 'department_id');
+			},
+			'schoolClass.department' => function ($query) {
+				$query->select('department_id', 'name');
+			},
+		]);
+	}
 
 	public function teacher(): BelongsTo
 	{
