@@ -4,6 +4,7 @@ use App\Http\Controllers\TeacherManagementController;
 use App\Http\Controllers\SubjectManagementController;
 use App\Http\Controllers\SubjectAssignmentController;
 use App\Http\Controllers\DepartmentManagementController;
+use App\Http\Controllers\SchoolClassManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -55,4 +56,10 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 		DepartmentManagementController::class,
 		'deleteDepartment',
 	]);
+
+	// クラス情報
+	Route::post('/class/register', [SchoolClassManagementController::class, 'classRegister']);
+	Route::get('/class', [SchoolClassManagementController::class, 'getClassList']);
+	Route::put('/class/{class}', [SchoolClassManagementController::class, 'updateClass']);
+	Route::delete('/class/{class}', [SchoolClassManagementController::class, 'deleteClass']);
 });
