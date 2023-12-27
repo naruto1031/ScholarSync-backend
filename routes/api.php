@@ -49,6 +49,16 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::get('/issue', [IssueManagementController::class, 'getIssueList']);
 	Route::put('/issue/{issue_id}', [IssueManagementController::class, 'updateIssue']);
 	Route::delete('/issue/{issue_id}', [IssueManagementController::class, 'deleteIssue']);
+
+	// 課題学科割り当て情報
+	Route::post('/issue/department/assign', [
+		IssueManagementController::class,
+		'registerIssueDepartment',
+	]);
+	Route::delete('/issue/department/assign/{issue_department}', [
+		IssueManagementController::class,
+		'deleteIssueDepartment',
+	]);
 });
 
 Route::middleware(['jwt.verify', 'admin'])->group(function () {
