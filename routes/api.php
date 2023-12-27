@@ -6,6 +6,7 @@ use App\Http\Controllers\SubjectAssignmentController;
 use App\Http\Controllers\DepartmentManagementController;
 use App\Http\Controllers\SchoolClassManagementController;
 use App\Http\Controllers\ClassTeacherAssignmentController;
+use App\Http\Controllers\IssueManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +43,22 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 		'deleteClassTeacherAssignment',
 	]);
 	Route::get('/class/assign', [ClassTeacherAssignmentController::class, 'getClassTeacherList']);
+
+	// 課題情報
+	Route::post('/issue/register', [IssueManagementController::class, 'registerIssue']);
+	Route::get('/issue', [IssueManagementController::class, 'getIssueList']);
+	Route::put('/issue/{issue_id}', [IssueManagementController::class, 'updateIssue']);
+	Route::delete('/issue/{issue_id}', [IssueManagementController::class, 'deleteIssue']);
+
+	// 課題学科割り当て情報
+	Route::post('/issue/department/assign', [
+		IssueManagementController::class,
+		'registerIssueDepartment',
+	]);
+	Route::delete('/issue/department/assign/{issue_department}', [
+		IssueManagementController::class,
+		'deleteIssueDepartment',
+	]);
 });
 
 Route::middleware(['jwt.verify', 'admin'])->group(function () {

@@ -55,8 +55,10 @@ entity "課題" as issue {
   --
   # 担当ID <<FK>>
   課題名
+  課題ナンバー
   納期
   コメント
+  非公開フラグ
 }
 
 entity "課題学科" as issue_department {
