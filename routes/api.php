@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentManagementController;
 use App\Http\Controllers\SchoolClassManagementController;
 use App\Http\Controllers\ClassTeacherAssignmentController;
 use App\Http\Controllers\IssueManagementController;
+use App\Http\Controllers\StudentManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::middleware(['jwt.verify', 'student'])->group(function () {
+	Route::post('/student/register', [StudentManagementController::class, 'registerStudent']);
+	Route::get('/student', [StudentManagementController::class, 'getStudentInfo']);
+	Route::put('/student', [StudentManagementController::class, 'updateStudent']);
+	Route::delete('/student', [StudentManagementController::class, 'deleteStudent']);
+	Route::get('/student/exists', [StudentManagementController::class, 'checkStudentExists']);
+});
 
 Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	// 教師情報
