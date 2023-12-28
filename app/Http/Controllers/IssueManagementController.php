@@ -47,31 +47,26 @@ class IssueManagementController extends Controller
 		try {
 			$validatedData = $this->validateRegisterIssue($request);
 
-			// 課題を登録
-			$issue = new Issue([
-				'teacher_subject_id' => $validatedData['teacher_subject_id'],
-				'name' => $validatedData['name'],
-				'due_date' => $validatedData['due_date'],
-				'comment' => $validatedData['comment'],
-				'task_number' => $validatedData['task_number'],
-				'private_flag' => $validatedData['private_flag'],
-			]);
-			$issue->save();
+			$issue = Issue::registerNewIssue($validatedData);
+			$issueId = $issue->issue_id;
 
-			// 課題を実施する学科を設定
-			$departmentIds = $validatedData['department_ids'];
-
-			foreach ($departmentIds as $departmentId) {
-				$issueDepartment = new IssueDepartment([
-					'issue_id' => $issue->issue_id,
+			foreach ($validatedData['department_ids'] as $departmentId) {
+				$issueDepartment = IssueDepartment::registerNewIssueDepartment([
+					'issue_id' => $issueId,
 					'department_id' => $departmentId,
 				]);
-				$issueDepartment->save();
 			}
 
 			DB::commit();
-			return response()->json(['message' => 'Issue registered successfully'], 201);
+			return response()->json(
+				[
+					'issue' => $issue,
+					'issue_department' => $issueDepartment,
+				],
+				201
+			);
 		} catch (\Exception $e) {
+			DB::rollBack();
 			return response()->json(['error' => $e->getMessage()], 400);
 		}
 	}
@@ -91,16 +86,9 @@ class IssueManagementController extends Controller
 		try {
 			$validatedData = $this->validateUpdateIssue($request);
 
-			$issue = Issue::find($issue_id);
-			$issue->teacher_subject_id = $validatedData['teacher_subject_id'];
-			$issue->name = $validatedData['name'];
-			$issue->due_date = $validatedData['due_date'];
-			$issue->comment = $validatedData['comment'];
-			$issue->task_number = $validatedData['task_number'];
-			$issue->private_flag = $validatedData['private_flag'];
-			$issue->save();
+			$issue = Issue::updateIssue($validatedData);
 
-			return response()->json(['message' => 'Issue updated successfully'], 201);
+			return response()->json($issue, 201);
 		} catch (\Exception $e) {
 			return response()->json(['error' => $e->getMessage()], 400);
 		}
@@ -125,7 +113,6 @@ class IssueManagementController extends Controller
 				);
 			}
 		} catch (\Exception $e) {
-			DB::rollBack();
 			return response()->json(['error' => $e->getMessage()], 400);
 		}
 	}
@@ -138,14 +125,9 @@ class IssueManagementController extends Controller
 				'department_id' => 'required|string|exists:departments,department_id',
 			]);
 
-			$issueDepartment = new IssueDepartment([
-				'issue_id' => $validatedData['issue_id'],
-				'department_id' => $validatedData['department_id'],
-			]);
+			$issueDepartment = IssueDepartment::registerNewIssueDepartment($validatedData);
 
-			$issueDepartment->save();
-
-			return response()->json(['message' => 'IssueDepartment registered successfully'], 201);
+			return response()->json($issueDepartment, 201);
 		} catch (\Exception $e) {
 			return response()->json(['error' => $e->getMessage()], 400);
 		}

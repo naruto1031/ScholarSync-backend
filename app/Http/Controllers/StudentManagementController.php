@@ -55,21 +55,11 @@ class StudentManagementController extends Controller
 			if (is_null($studentId)) {
 				return response()->json(['message' => 'JWT subject cannot be null'], 400);
 			}
-
 			$validatedData = $this->validatedRegisterStudent($request);
+			$validatedData['student_id'] = $studentId;
+			$student = Student::registerNewStudent($validatedData);
 
-			$student = new Student([
-				'student_id' => $studentId,
-				'class_id' => $validatedData['class_id'],
-				'email' => $validatedData['email'],
-				'name' => $validatedData['name'],
-				'registration_number' => $validatedData['registration_number'],
-				'attendance_number' => $validatedData['attendance_number'],
-			]);
-
-			$student->save();
-
-			return response()->json(['message' => 'Student registered successfully'], 201);
+			return response()->json($student, 201);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
@@ -84,11 +74,8 @@ class StudentManagementController extends Controller
 			}
 
 			$student = Student::find($studentId);
-			$class = SchoolClass::find($student->class_id);
-			$department = Department::find($class->department_id);
-			$displayClassName = $department->name . $class->name;
 			$studentInfo = [
-				'class_name' => $displayClassName,
+				'class_name' => $student->getClassDisplayName(),
 				'registration_number' => $student->registration_number,
 				'attendance_number' => $student->attendance_number,
 			];
@@ -107,11 +94,11 @@ class StudentManagementController extends Controller
 				return response()->json(['message' => 'JWT subject cannot be null'], 400);
 			}
 
-			$student = Student::find($studentId);
 			$validatedData = $this->validatedUpdateStudent($request);
-			$student->fill($validatedData)->save();
+			$validatedData['student_id'] = $studentId;
+			$student = Student::updateStudent($validatedData);
 
-			return response()->json(['message' => 'Student updated successfully'], 201);
+			return response()->json($student, 201);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
@@ -124,10 +111,7 @@ class StudentManagementController extends Controller
 			if (is_null($studentId)) {
 				return response()->json(['message' => 'JWT subject cannot be null'], 400);
 			}
-
-			$student = Student::find($studentId);
-			$student->delete();
-
+			Student::deleteStudent($studentId);
 			return response()->json(['message' => 'Student deleted successfully'], 201);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
