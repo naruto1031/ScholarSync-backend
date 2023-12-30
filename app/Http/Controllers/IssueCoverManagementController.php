@@ -14,7 +14,7 @@ class IssueCoverManagementController extends Controller
 		$validatedData = $request->validate([
 			'issue_id' => 'required|string|exists:issues,issue_id',
 			'status' => 'required|string',
-			'comment' => 'sometime|string',
+			'comment' => 'sometimes|string',
 		]);
 		return $validatedData;
 	}
@@ -23,7 +23,7 @@ class IssueCoverManagementController extends Controller
 	{
 		$validatedData = $request->validate([
 			'status' => 'required|string',
-			'comment' => 'sometime|string',
+			'comment' => 'sometimes|string',
 		]);
 		return $validatedData;
 	}
