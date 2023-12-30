@@ -10,10 +10,8 @@ return new class extends Migration {
 	 */
 	public function up(): void
 	{
-		Schema::create('subjects', function (Blueprint $table) {
-			$table->id('subject_id'); // 教科ID
-			$table->string('name')->unique();
-			$table->timestamps();
+		Schema::table('audits', function (Blueprint $table) {
+			$table->string('user_id')->change();
 		});
 	}
 
@@ -22,6 +20,8 @@ return new class extends Migration {
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists('subjects');
+		Schema::table('audits', function (Blueprint $table) {
+			$table->integer('user_id')->change();
+		});
 	}
 };

@@ -10,10 +10,8 @@ return new class extends Migration {
 	 */
 	public function up(): void
 	{
-		Schema::create('subjects', function (Blueprint $table) {
-			$table->id('subject_id'); // 教科ID
-			$table->string('name')->unique();
-			$table->timestamps();
+		Schema::table('issue_cover_statuses', function (Blueprint $table) {
+			$table->string('evaluation')->nullable(); // 評定カラムを追加
 		});
 	}
 
@@ -22,6 +20,8 @@ return new class extends Migration {
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists('subjects');
+		Schema::table('issue_cover_statuses', function (Blueprint $table) {
+			$table->dropColumn('evaluation'); // 評定カラムを削除
+		});
 	}
 };

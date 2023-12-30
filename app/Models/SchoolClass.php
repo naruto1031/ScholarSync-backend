@@ -11,6 +11,9 @@ class SchoolClass extends Model
 {
 	use HasFactory;
 
+	protected $primaryKey = 'class_id';
+	protected $fillable = ['department_id', 'name'];
+
 	public function department(): BelongsTo
 	{
 		return $this->belongsTo(Department::class, 'department_id');
@@ -24,5 +27,14 @@ class SchoolClass extends Model
 	public function classTeachers(): HasMany
 	{
 		return $this->hasMany(ClassTeacher::class, 'class_id');
+	}
+
+	public function scopeWithDepartment($query)
+	{
+		return $query->with([
+			'department' => function ($query) {
+				$query->select('department_id', 'name');
+			},
+		]);
 	}
 }

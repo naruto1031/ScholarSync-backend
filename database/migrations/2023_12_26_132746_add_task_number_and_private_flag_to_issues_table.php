@@ -10,10 +10,9 @@ return new class extends Migration {
 	 */
 	public function up(): void
 	{
-		Schema::create('subjects', function (Blueprint $table) {
-			$table->id('subject_id'); // 教科ID
-			$table->string('name')->unique();
-			$table->timestamps();
+		Schema::table('issues', function (Blueprint $table) {
+			$table->string('task_number')->nullable();
+			$table->boolean('private_flag')->default(false);
 		});
 	}
 
@@ -22,6 +21,9 @@ return new class extends Migration {
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists('subjects');
+		Schema::table('issues', function (Blueprint $table) {
+			$table->dropColumn('task_number');
+			$table->dropColumn('private_flag');
+		});
 	}
 };
