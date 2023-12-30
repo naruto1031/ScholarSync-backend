@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentManagementController;
 use App\Http\Controllers\SchoolClassManagementController;
 use App\Http\Controllers\ClassTeacherAssignmentController;
 use App\Http\Controllers\IssueManagementController;
+use App\Http\Controllers\IssueCoverManagementController;
 use App\Http\Controllers\StudentManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +22,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::middleware(['jwt.verify', 'student'])->group(function () {
+	// 生徒情報
 	Route::post('/student/register', [StudentManagementController::class, 'registerStudent']);
 	Route::get('/student', [StudentManagementController::class, 'getStudentInfo']);
 	Route::put('/student', [StudentManagementController::class, 'updateStudent']);
 	Route::delete('/student', [StudentManagementController::class, 'deleteStudent']);
 	Route::get('/student/exists', [StudentManagementController::class, 'checkStudentExists']);
+
+	// 課題表紙情報
+	Route::post('/issue/cover/register', [
+		IssueCoverManagementController::class,
+		'registerIssueCover',
+	]);
+	Route::post('/issue/cover', [IssueCoverManagementController::class, 'searchIssueCover']);
+	Route::delete('/issue/cover/{issue_cover}', [
+		IssueCoverManagementController::class,
+		'deleteIssueCover',
+	]);
 });
 
 Route::middleware(['jwt.verify', 'teacher'])->group(function () {

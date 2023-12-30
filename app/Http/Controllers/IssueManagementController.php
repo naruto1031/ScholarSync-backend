@@ -22,6 +22,8 @@ class IssueManagementController extends Controller
 			'task_number' => 'required|string',
 			'private_flag' => 'required|boolean',
 			'department_ids' => 'required|array',
+			'challenge_flag' => 'sometimes|boolean',
+			'challenge_max_score' => 'sometimes|integer',
 		]);
 
 		return $validatedData;
@@ -30,12 +32,24 @@ class IssueManagementController extends Controller
 	private function validateUpdateIssue(Request $request): array
 	{
 		$validatedData = $request->validate([
-			'teacher_subject_id' => 'required|string|exists:teacher_subjects,teacher_subject_id',
-			'name' => 'required|string',
-			'due_date' => 'required|date',
-			'comment' => 'required|string',
-			'task_number' => 'required|string',
-			'private_flag' => 'required|boolean',
+			'teacher_subject_id' => 'sometimes|string|exists:teacher_subjects,teacher_subject_id',
+			'name' => 'sometimes|string',
+			'due_date' => 'sometimes|date',
+			'comment' => 'sometimes|string',
+			'task_number' => 'sometimes|string',
+			'private_flag' => 'sometimes|boolean',
+			'challenge_flag' => 'sometimes|boolean',
+			'challenge_max_score' => 'sometimes|integer',
+		]);
+
+		return $validatedData;
+	}
+
+	private function validateRegisterIssueDepartment(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'issue_id' => 'required|string|exists:issues,issue_id',
+			'department_id' => 'required|string|exists:departments,department_id',
 		]);
 
 		return $validatedData;
@@ -81,7 +95,7 @@ class IssueManagementController extends Controller
 		}
 	}
 
-	public function updateIssue(Request $request, string $issue_id): JsonResponse
+	public function updateIssue(Request $request): JsonResponse
 	{
 		try {
 			$validatedData = $this->validateUpdateIssue($request);
@@ -120,10 +134,7 @@ class IssueManagementController extends Controller
 	public function registerIssueDepartment(Request $request): JsonResponse
 	{
 		try {
-			$validatedData = $request->validate([
-				'issue_id' => 'required|string|exists:issues,issue_id',
-				'department_id' => 'required|string|exists:departments,department_id',
-			]);
+			$validatedData = $this->validateRegisterIssueDepartment($request);
 
 			$issueDepartment = IssueDepartment::registerNewIssueDepartment($validatedData);
 

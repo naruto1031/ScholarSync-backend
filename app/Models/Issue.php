@@ -25,6 +25,8 @@ class Issue extends Model implements AuditableContract
 		'comment',
 		'task_number',
 		'private_flag',
+		'challenge_flag',
+		'challenge_max_score',
 	];
 
 	public function teacherSubject(): BelongsTo
@@ -51,6 +53,8 @@ class Issue extends Model implements AuditableContract
 			'comment' => $data['comment'],
 			'task_number' => $data['task_number'],
 			'private_flag' => $data['private_flag'],
+			'challenge_flag' => $data['challenge_flag'] ?? false,
+			'challenge_max_score' => $data['challenge_max_score'] ?? 0,
 		]);
 
 		$issue->save();
@@ -61,11 +65,8 @@ class Issue extends Model implements AuditableContract
 	public static function updateIssue($data): Issue
 	{
 		$issue = self::where('issue_id', $data['issue_id'])->first();
-		$issue->name = $data['name'];
-		$issue->due_date = $data['due_date'];
-		$issue->comment = $data['comment'];
-		$issue->task_number = $data['task_number'];
-		$issue->private_flag = $data['private_flag'];
+
+		$issue->fill($data);
 
 		$issue->save();
 
