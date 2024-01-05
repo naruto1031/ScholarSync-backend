@@ -17,6 +17,9 @@ class IssueCover extends Model implements AuditableContract
 		AuditableCustom::transformAudit insteadof Auditable;
 	}
 
+	protected $primaryKey = 'issue_cover_id';
+	protected $fillable = ['issue_id', 'student_id', 'comment'];
+
 	public function issue(): BelongsTo
 	{
 		return $this->belongsTo(Issue::class, 'issue_id');
@@ -37,7 +40,7 @@ class IssueCover extends Model implements AuditableContract
 		$issueCover = new self([
 			'issue_id' => $data['issue_id'],
 			'student_id' => $data['student_id'],
-			'comment' => $data['comment'] ?? '',
+			'comment' => $data['comment'],
 		]);
 
 		$issueCover->save();

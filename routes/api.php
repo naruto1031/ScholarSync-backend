@@ -30,6 +30,10 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 	Route::get('/student/exists', [StudentManagementController::class, 'checkStudentExists']);
 
 	// 課題表紙情報
+	Route::get('/issue/cover/not_submitted', [
+		IssueCoverManagementController::class,
+		'getNotSubmittedIssueCover',
+	]);
 	Route::post('/issue/cover/register', [
 		IssueCoverManagementController::class,
 		'registerIssueCover',
@@ -39,6 +43,9 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 		IssueCoverManagementController::class,
 		'deleteIssueCover',
 	]);
+
+	// クラス一覧
+	Route::get('/class', [SchoolClassManagementController::class, 'getClassList']);
 });
 
 Route::middleware(['jwt.verify', 'teacher'])->group(function () {
@@ -90,10 +97,7 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
 
 	// 学科情報
-	Route::post('/department/register', [
-		DepartmentManagementController::class,
-		'departmentRegister',
-	]);
+	Route::post('/9/register', [DepartmentManagementController::class, 'departmentRegister']);
 	Route::get('/department', [DepartmentManagementController::class, 'getDepartmentList']);
 	Route::put('/department/{department}', [
 		DepartmentManagementController::class,
