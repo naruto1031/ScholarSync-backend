@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\IssueCover;
 use App\Models\IssueCoverStatus;
+use App\Models\Issue;
 use Illuminate\Support\Facades\DB;
 
 class IssueCoverManagementController extends Controller
@@ -45,7 +46,7 @@ class IssueCoverManagementController extends Controller
 			$issueCover = IssueCover::registerNewIssueCover([
 				'issue_id' => $validatedData['issue_id'],
 				'student_id' => $validatedData['student_id'],
-				'comment' => $validatedData['comment'],
+				'comment' => $validatedData['comment'] ?? '',
 			]);
 
 			$issueCoverStatus = IssueCoverStatus::registerNewIssueCoverStatus([
@@ -84,6 +85,27 @@ class IssueCoverManagementController extends Controller
 			$validatedData = $this->validatedSearchIssueCover($request);
 			$issueCovers = IssueCover::findByStatuses($validatedData['statuses']);
 			return response()->json(['issue_covers' => $issueCovers], 200);
+		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function getNotSubmittedIssueCover(Request $request)
+	{
+		try {
+			$studentId = $request->attributes->get('jwt_sub');
+			$issueIds = IssueCover::where('student_id', $studentId)->pluck('issue_id');
+
+			$issues = Issue::whereNotIn('issue_id', $issueIds)
+				->with('teacherSubject.subject')
+				->get()
+				->map(function ($issue) {
+					$issue->subject_name = $issue->teacherSubject->subject->name;
+					unset($issue->teacherSubject, $issue->created_at, $issue->updated_at);
+					return $issue;
+				});
+
+			return response()->json(['issues' => $issues], 200);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
