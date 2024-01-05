@@ -30,6 +30,10 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 	Route::get('/student/exists', [StudentManagementController::class, 'checkStudentExists']);
 
 	// 課題表紙情報
+	Route::get('/issue/cover/not_submitted', [
+		IssueCoverManagementController::class,
+		'getNotSubmittedIssueCover',
+	]);
 	Route::post('/issue/cover/register', [
 		IssueCoverManagementController::class,
 		'registerIssueCover',
