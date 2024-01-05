@@ -54,9 +54,7 @@ class SchoolClassManagementController extends Controller
 			$formattedClasses = $classes->map(function ($class) {
 				return [
 					'class_id' => $class->class_id,
-					'name' => $class->name,
-					'department_id' => $class->department_id,
-					'department_name' => $class->department->name,
+					'name' => $class->department->name . $class->name,
 				];
 			});
 			return response()->json($formattedClasses);
