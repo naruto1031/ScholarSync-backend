@@ -53,11 +53,11 @@ class IssueCoverManagementController extends Controller
 				'issue_cover_id' => $issueCover->issue_cover_id,
 				'status' => $validatedData['status'],
 			]);
+
+			$responseData = $this->getNotSubmittedIssueCover($request);
 			DB::commit();
-			return response()->json(
-				['issue_cover' => $issueCover, 'issue_cover_status' => $issueCoverStatus],
-				201
-			);
+
+			return response()->json($responseData->original, 201);
 		} catch (\Exception $e) {
 			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 400);

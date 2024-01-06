@@ -45,7 +45,7 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 	]);
 
 	// クラス一覧
-	Route::get('/class', [SchoolClassManagementController::class, 'getClassList']);
+	Route::get('/student/class', [SchoolClassManagementController::class, 'getClassList']);
 });
 
 Route::middleware(['jwt.verify', 'teacher'])->group(function () {
