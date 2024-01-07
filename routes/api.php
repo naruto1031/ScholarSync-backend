@@ -97,7 +97,10 @@ Route::middleware(['jwt.verify', 'admin'])->group(function () {
 	Route::delete('/subject/{subject}', [SubjectManagementController::class, 'deleteSubject']);
 
 	// 学科情報
-	Route::post('/9/register', [DepartmentManagementController::class, 'departmentRegister']);
+	Route::post('/department/register', [
+		DepartmentManagementController::class,
+		'departmentRegister',
+	]);
 	Route::get('/department', [DepartmentManagementController::class, 'getDepartmentList']);
 	Route::put('/department/{department}', [
 		DepartmentManagementController::class,

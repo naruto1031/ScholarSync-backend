@@ -18,6 +18,7 @@ class Student extends Model implements AuditableContract
 	}
 
 	protected $primaryKey = 'student_id';
+	public $incrementing = false;
 	protected $fillable = [
 		'student_id',
 		'class_id',
