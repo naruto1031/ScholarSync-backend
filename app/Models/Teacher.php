@@ -17,6 +17,7 @@ class Teacher extends Model implements AuditableContract
 	}
 
 	protected $primaryKey = 'teacher_id';
+	public $incrementing = false;
 
 	protected $fillable = ['teacher_id', 'name', 'email'];
 

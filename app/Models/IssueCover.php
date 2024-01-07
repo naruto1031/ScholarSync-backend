@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Http\Resources\IssueCoverResource;
+use App\Http\Resources\NotSubmittedIssueCoverResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,12 +56,42 @@ class IssueCover extends Model implements AuditableContract
 		$issueCover->delete();
 	}
 
-	public static function findByStatuses(array $statuses)
+	public static function findByStatusesAndStudentId(array $statuses, $student_id)
 	{
-		return self::whereHas('issueCoverStatus', function ($query) use ($statuses) {
-			$query->whereIn('status', $statuses);
-		})
-			->with('issueCoverStatus')
+		$data = self::select('issue_cover_id', 'issue_id', 'comment')
+			->where('student_id', $student_id)
+			->whereHas('issueCoverStatus', function ($query) use ($statuses) {
+				$query->whereIn('status', $statuses);
+			})
+			->with('issueCoverStatus', 'issue.teacherSubject.teacher', 'issue.teacherSubject.subject')
 			->get();
+
+		return $data;
+	}
+
+	public static function findNotSubmittedByStudentId($studentId)
+	{
+		$issueIds = self::where('student_id', $studentId)->pluck('issue_id');
+		$student = Student::where('student_id', $studentId)
+			->with('schoolClass.department')
+			->first();
+
+		$studentDepartmentId = optional($student->schoolClass)->department_id;
+
+		$departmentIssueIds = IssueDepartment::where('department_id', $studentDepartmentId)->pluck(
+			'issue_id'
+		);
+
+		$issues = Issue::whereNotIn('issue_id', $issueIds)
+			->whereIn('issue_id', $departmentIssueIds)
+			->with(['teacherSubject.subject'])
+			->get()
+			->map(function ($issue) {
+				$issue->subject_name = $issue->teacherSubject->subject->name;
+				unset($issue->teacherSubject, $issue->created_at, $issue->updated_at);
+				return $issue;
+			});
+
+		return $issues;
 	}
 }
