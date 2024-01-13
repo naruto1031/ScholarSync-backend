@@ -51,6 +51,12 @@ class SubjectManagementController extends Controller
 	public function getSubjectList(): JsonResponse
 	{
 		$subjects = Subject::all();
+		$subjects = $subjects->map(function ($subject) {
+			return [
+				'id' => $subject->subject_id,
+				'name' => $subject->name,
+			];
+		});
 		return response()->json($subjects);
 	}
 }

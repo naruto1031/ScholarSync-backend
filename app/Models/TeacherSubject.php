@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class TeacherSubject extends Model
 {
@@ -34,6 +35,14 @@ class TeacherSubject extends Model
 			'subject' => function ($query) {
 				$query->select('subject_id', 'name');
 			},
+		]);
+	}
+
+	public static function registerSubjects(string $teacherId, array $teacherSubject)
+	{
+		$teacherSubject = new self([
+			'teacher_id' => $teacherId,
+			'subject_id' => $teacherSubject,
 		]);
 	}
 }
