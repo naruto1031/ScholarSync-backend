@@ -35,8 +35,8 @@ class SubjectAssignmentController extends Controller
 					'subject_id' => $subjectId,
 				]);
 				$teacherSubject->save();
-				DB::commit();
 			}
+			DB::commit();
 		} catch (\Exception $e) {
 			DB::rollback();
 			return response()->json(['message' => 'Subject assignment failed'], 400);

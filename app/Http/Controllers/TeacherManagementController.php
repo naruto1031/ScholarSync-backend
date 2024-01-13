@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Teacher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TeacherManagementController extends Controller
 {
@@ -20,21 +22,19 @@ class TeacherManagementController extends Controller
 
 	public function teacherRegister(Request $request): JsonResponse
 	{
-		$validatedData = $this->validateTeacher($request);
-		$teacher_id = $request->attributes->get('jwt_sub');
+		try {
+			$validatedData = $this->validateTeacher($request);
+			$teacher_id = $request->attributes->get('jwt_sub');
 
-		if (is_null($teacher_id)) {
-			return response()->json(['message' => 'JWT subject cannot be null'], 400);
+			if (is_null($teacher_id)) {
+				return response()->json(['message' => 'JWT subject cannot be null'], 400);
+			}
+			$validatedData['teacher_id'] = $teacher_id;
+			$teacher = Teacher::registerTeacher($validatedData);
+		} catch (\Exception $e) {
+			return response()->json(['message' => 'Teacher registration failed'], 400);
 		}
-
-		$teacher = new Teacher([
-			'teacher_id' => $teacher_id,
-			'name' => $validatedData['name'],
-			'email' => $validatedData['email'],
-		]);
-		$teacher->save();
-
-		return response()->json(['message' => 'Teacher registered successfully'], 201);
+		return response()->json($teacher, 201);
 	}
 
 	public function checkTeacherExists(Request $request): JsonResponse
