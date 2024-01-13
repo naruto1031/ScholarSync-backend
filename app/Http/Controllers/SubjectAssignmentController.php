@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\TeacherSubject;
+use Illuminate\Support\Facades\DB;
 
 class SubjectAssignmentController extends Controller
 {
 	private function validateSubjectAssignment(Request $request): array
 	{
 		$validatedData = $request->validate([
-			'subject_id' => 'required|string',
+			'subject_id' => 'required|array',
+			'subject_id.*' => 'required|string',
 		]);
 
 		return $validatedData;
@@ -20,20 +22,26 @@ class SubjectAssignmentController extends Controller
 	public function assignSubjectToTeacher(Request $request): JsonResponse
 	{
 		$validatedData = $this->validateSubjectAssignment($request);
-		$teacher_id = $request->attributes->get('jwt_sub');
+		$teacherId = $request->attributes->get('jwt_sub');
 
-		if (is_null($teacher_id)) {
+		if (is_null($teacherId)) {
 			return response()->json(['message' => 'JWT subject cannot be null'], 400);
 		}
-
-		$teacherSubject = new TeacherSubject([
-			'teacher_id' => $teacher_id,
-			'subject_id' => $validatedData['subject_id'],
-		]);
-
-		$teacherSubject->save();
-
-		return response()->json(['message' => 'Subject assigned successfully'], 201);
+		DB::beginTransaction();
+		try {
+			foreach ($validatedData['subject_id'] as $subjectId) {
+				$teacherSubject = new TeacherSubject([
+					'teacher_id' => $teacherId,
+					'subject_id' => $subjectId,
+				]);
+				$teacherSubject->save();
+			}
+			DB::commit();
+		} catch (\Exception $e) {
+			DB::rollback();
+			return response()->json(['message' => 'Subject assignment failed'], 400);
+		}
+		return response()->json($teacherSubject, 201);
 	}
 
 	public function deleteSubjectAssignment(string $teacher_subject_id): JsonResponse
