@@ -56,6 +56,9 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::delete('/teacher', [TeacherManagementController::class, 'deleteTeacher']);
 	Route::get('/teacher/exists', [TeacherManagementController::class, 'checkTeacherExists']);
 
+	// 教科情報
+	Route::get('/teacher/subject', [SubjectManagementController::class, 'getSubjectList']);
+
 	// 教師への教科の割り当て
 	Route::post('/subject/assign', [SubjectAssignmentController::class, 'assignSubjectToTeacher']);
 	Route::delete('/subject/assign/{teacher_subject}', [
@@ -87,6 +90,9 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 		IssueManagementController::class,
 		'deleteIssueDepartment',
 	]);
+
+	// クラス一覧
+	Route::get('/teacher/class', [SchoolClassManagementController::class, 'getClassList']);
 });
 
 Route::middleware(['jwt.verify', 'admin'])->group(function () {
