@@ -5,10 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use App\Traits\AuditableCustom;
 
-class ClassTeacher extends Model
+class ClassTeacher extends Model implements AuditableContract
 {
 	use HasFactory;
+	use Auditable, AuditableCustom {
+		AuditableCustom::transformAudit insteadof Auditable;
+	}
+
 	protected $primaryKey = 'class_teacher_id';
 	protected $fillable = ['class_id', 'teacher_id'];
 

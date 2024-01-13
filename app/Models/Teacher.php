@@ -30,4 +30,17 @@ class Teacher extends Model implements AuditableContract
 	{
 		return $this->hasMany(TeacherSubject::class, 'teacher_id');
 	}
+
+	public static function registerTeacher(array $data): Teacher
+	{
+		$teacher = new self([
+			'teacher_id' => $data['teacher_id'],
+			'name' => $data['name'],
+			'email' => $data['email'],
+		]);
+
+		$teacher->save();
+
+		return $teacher;
+	}
 }

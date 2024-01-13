@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use App\Traits\AuditableCustom;
 
-class TeacherSubject extends Model
+class TeacherSubject extends Model implements AuditableContract
 {
 	use HasFactory;
+	use Auditable, AuditableCustom {
+		AuditableCustom::transformAudit insteadof Auditable;
+	}
+
 	protected $primaryKey = 'teacher_subject_id';
 	protected $fillable = ['teacher_id', 'subject_id'];
 
@@ -44,5 +50,7 @@ class TeacherSubject extends Model
 			'teacher_id' => $teacherId,
 			'subject_id' => $teacherSubject,
 		]);
+
+		$teacherSubject->save();
 	}
 }
