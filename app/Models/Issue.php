@@ -50,7 +50,7 @@ class Issue extends Model implements AuditableContract
 			'teacher_subject_id' => $data['teacher_subject_id'],
 			'name' => $data['name'],
 			'due_date' => $data['due_date'],
-			'comment' => $data['comment'],
+			'comment' => $data['comment'] ?? '',
 			'task_number' => $data['task_number'],
 			'private_flag' => $data['private_flag'],
 			'challenge_flag' => $data['challenge_flag'] ?? false,
