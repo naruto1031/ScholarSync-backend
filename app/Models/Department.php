@@ -28,4 +28,16 @@ class Department extends Model implements AuditableContract
 	{
 		return $this->hasMany(IssueDepartment::class, 'department_id');
 	}
+
+	public static function getDepartmentList()
+	{
+		$departments = self::all();
+		$departments = $departments->map(function ($department) {
+			return [
+				'department_id' => $department->department_id,
+				'name' => $department->name,
+			];
+		});
+		return $departments;
+	}
 }

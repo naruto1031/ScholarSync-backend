@@ -31,7 +31,7 @@ class DepartmentManagementController extends Controller
 
 	public function getDepartmentList(): JsonResponse
 	{
-		$departments = Department::all();
+		$departments = Department::getDepartmentList();
 		return response()->json($departments);
 	}
 

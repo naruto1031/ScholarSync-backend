@@ -18,7 +18,8 @@ class IssueManagementController extends Controller
 			'teacher_subject_id' => 'required|string|exists:teacher_subjects,teacher_subject_id',
 			'name' => 'required|string',
 			'due_date' => 'required|date',
-			'comment' => 'required|string',
+			// コメントはない場合もあるので、requiredを外す
+			'comment' => 'sometimes|string',
 			'task_number' => 'required|string',
 			'private_flag' => 'required|boolean',
 			'department_ids' => 'required|array',
