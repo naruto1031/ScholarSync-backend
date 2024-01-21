@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\IssueResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Issue;
-use App\Models\TeacherSubject;
-use App\Models\Department;
+use App\Models\IssueClass;
 use App\Models\IssueDepartment;
 use Illuminate\Support\Facades\DB;
 
@@ -17,12 +17,10 @@ class IssueManagementController extends Controller
 		$validatedData = $request->validate([
 			'teacher_subject_id' => 'required|string|exists:teacher_subjects,teacher_subject_id',
 			'name' => 'required|string',
-			'due_date' => 'required|date',
-			// コメントはない場合もあるので、requiredを外す
+			'due_dates' => 'required|array',
 			'comment' => 'sometimes|string',
 			'task_number' => 'required|string',
 			'private_flag' => 'required|boolean',
-			'department_ids' => 'required|array',
 			'challenge_flag' => 'sometimes|boolean',
 			'challenge_max_score' => 'sometimes|integer',
 		]);
@@ -35,7 +33,7 @@ class IssueManagementController extends Controller
 		$validatedData = $request->validate([
 			'teacher_subject_id' => 'sometimes|string|exists:teacher_subjects,teacher_subject_id',
 			'name' => 'sometimes|string',
-			'due_date' => 'sometimes|date',
+			'due_dates' => 'sometimes|array',
 			'comment' => 'sometimes|string',
 			'task_number' => 'sometimes|string',
 			'private_flag' => 'sometimes|boolean',
@@ -61,25 +59,19 @@ class IssueManagementController extends Controller
 		DB::beginTransaction();
 		try {
 			$validatedData = $this->validateRegisterIssue($request);
-
 			$issue = Issue::registerNewIssue($validatedData);
 			$issueId = $issue->issue_id;
 
-			foreach ($validatedData['department_ids'] as $departmentId) {
-				$issueDepartment = IssueDepartment::registerNewIssueDepartment([
+			foreach ($validatedData['due_dates'] as $data) {
+				IssueClass::registerNewIssueClass([
 					'issue_id' => $issueId,
-					'department_id' => $departmentId,
+					'class_id' => $data['class_id'],
+					'due_date' => $data['due_date'],
 				]);
 			}
 
 			DB::commit();
-			return response()->json(
-				[
-					'issue' => $issue,
-					'issue_department' => $issueDepartment,
-				],
-				201
-			);
+			return response()->json($issue, 201);
 		} catch (\Exception $e) {
 			DB::rollBack();
 			return response()->json(['error' => $e->getMessage()], 400);
@@ -96,12 +88,53 @@ class IssueManagementController extends Controller
 		}
 	}
 
+	// teacher_subject_idを指定して、その教師が担当している課題を取得する
+	public function getIssueListByTeacherSubjectId(string $teacher_subject_id): JsonResponse
+	{
+		try {
+			$issues = IssueResource::collection(Issue::findIssueByTeacherSubjectId($teacher_subject_id));
+			return response()->json($issues);
+		} catch (\Exception $e) {
+			return response()->json(['error' => $e->getMessage()], 400);
+		}
+	}
+
 	public function updateIssue(Request $request): JsonResponse
 	{
 		try {
 			$validatedData = $this->validateUpdateIssue($request);
 
-			$issue = Issue::updateIssue($validatedData);
+			// $validationDataにvalueがあるものだけ更新する
+			$issue = Issue::updateIssue([
+				'issue_id' => $request->issue_id,
+				'teacher_subject_id' => $validatedData['teacher_subject_id'] ?? null,
+				'name' => $validatedData['name'] ?? null,
+				'comment' => $validatedData['comment'] ?? null,
+				'task_number' => $validatedData['task_number'] ?? null,
+				'private_flag' => $validatedData['private_flag'] ?? null,
+				'challenge_flag' => $validatedData['challenge_flag'] ?? null,
+				'challenge_max_score' => $validatedData['challenge_max_score'] ?? null,
+			]);
+
+			if (isset($validatedData['due_dates'])) {
+				foreach ($validatedData['due_dates'] as $data) {
+					// $dataにissue_class_idがあれば更新、なければ新規登録
+					if (isset($data['issue_class_id'])) {
+						IssueClass::updateIssueClass([
+							'issue_class_id' => $data['issue_class_id'],
+							'issue_id' => $issue->issue_id,
+							'class_id' => $data['class_id'],
+							'due_date' => $data['due_date'],
+						]);
+					} else {
+						IssueClass::registerNewIssueClass([
+							'issue_id' => $issue->issue_id,
+							'class_id' => $data['class_id'],
+							'due_date' => $data['due_date'],
+						]);
+					}
+				}
+			}
 
 			return response()->json($issue, 201);
 		} catch (\Exception $e) {

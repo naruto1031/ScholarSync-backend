@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\TeacherSubject;
+use App\Models\Subject;
+use App\Models\Department;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SubjectAssignmentController extends Controller
 {
@@ -61,14 +64,32 @@ class SubjectAssignmentController extends Controller
 		}
 
 		$teacherSubjects = TeacherSubject::withSubject($teacher_id)->get();
+		// SQLを取得する
+
+		DB::enableQueryLog();
 
 		$formattedSubjects = $teacherSubjects->map(function ($teacherSubject) {
 			return [
 				'teacher_subject_id' => $teacherSubject->teacher_subject_id,
+				'subject_id' => $teacherSubject->subject_id,
 				'name' => $teacherSubject->subject->name,
+				'departments' => $teacherSubject->subject->subjectDepartments
+					->pluck('department_id')
+					->map(function ($department_id) {
+						return [
+							'department_id' => $department_id,
+							'name' => Department::find($department_id)->name,
+							'classes' => Department::find($department_id)->schoolClasses->map(function ($class) {
+								return [
+									'class_id' => $class->class_id,
+									'name' => $class->name,
+								];
+							}),
+						];
+					}),
 			];
 		});
-
+		Log::debug(DB::getQueryLog());
 		return response()->json($formattedSubjects);
 	}
 }
