@@ -35,6 +35,11 @@ class SchoolClass extends Model implements AuditableContract
 		return $this->hasMany(ClassTeacher::class, 'class_id');
 	}
 
+	public function issueClasses(): HasMany
+	{
+		return $this->hasMany(IssueClass::class, 'class_id');
+	}
+
 	public function scopeWithDepartment($query)
 	{
 		return $query->with([

@@ -78,6 +78,10 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	// 課題情報
 	Route::post('/issue/register', [IssueManagementController::class, 'registerIssue']);
 	Route::get('/issue', [IssueManagementController::class, 'getIssueList']);
+	Route::get('/issue/{teacher_subject_id}', [
+		IssueManagementController::class,
+		'getIssueListByTeacherSubjectId',
+	]);
 	Route::put('/issue/{issue_id}', [IssueManagementController::class, 'updateIssue']);
 	Route::delete('/issue/{issue_id}', [IssueManagementController::class, 'deleteIssue']);
 

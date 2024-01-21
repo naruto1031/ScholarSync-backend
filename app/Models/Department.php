@@ -29,6 +29,11 @@ class Department extends Model implements AuditableContract
 		return $this->hasMany(IssueDepartment::class, 'department_id');
 	}
 
+	public function subjectDepartments(): HasMany
+	{
+		return $this->hasMany(SubjectDepartment::class, 'department_id');
+	}
+
 	public static function getDepartmentList()
 	{
 		$departments = self::all();
@@ -36,6 +41,12 @@ class Department extends Model implements AuditableContract
 			return [
 				'department_id' => $department->department_id,
 				'name' => $department->name,
+				'classes' => $department->schoolClasses->map(function ($schoolClass) {
+					return [
+						'class_id' => $schoolClass->class_id,
+						'name' => $schoolClass->name,
+					];
+				}),
 			];
 		});
 		return $departments;

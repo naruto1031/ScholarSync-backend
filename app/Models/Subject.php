@@ -16,4 +16,30 @@ class Subject extends Model
 	{
 		return $this->hasMany(TeacherSubject::class, 'subject_id');
 	}
+
+	public function subjectDepartments(): HasMany
+	{
+		return $this->hasMany(SubjectDepartment::class, 'subject_id');
+	}
+
+	public static function registerNewSubject($data): Subject
+	{
+		$subject = new self([
+			'name' => $data['name'],
+		]);
+
+		$subject->save();
+
+		return $subject;
+	}
+
+	public static function updateSubject($data): Subject
+	{
+		$subject = self::where('subject_id', $data['subject_id'])->first();
+		$subject->name = $data['name'];
+
+		$subject->save();
+
+		return $subject;
+	}
 }
