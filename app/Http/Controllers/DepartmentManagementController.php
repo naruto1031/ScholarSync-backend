@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Department;
+use Illuminate\Support\Facades\Log;
 
 class DepartmentManagementController extends Controller
 {

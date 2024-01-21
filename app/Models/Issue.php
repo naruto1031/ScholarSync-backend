@@ -21,7 +21,6 @@ class Issue extends Model implements AuditableContract
 	protected $fillable = [
 		'teacher_subject_id',
 		'name',
-		'due_date',
 		'comment',
 		'task_number',
 		'private_flag',
@@ -44,12 +43,16 @@ class Issue extends Model implements AuditableContract
 		return $this->hasMany(IssueCover::class, 'issue_id');
 	}
 
+	public function issueClasses(): HasMany
+	{
+		return $this->hasMany(IssueClass::class, 'issue_id');
+	}
+
 	public static function registerNewIssue($data): Issue
 	{
 		$issue = new self([
 			'teacher_subject_id' => $data['teacher_subject_id'],
 			'name' => $data['name'],
-			'due_date' => $data['due_date'],
 			'comment' => $data['comment'] ?? '',
 			'task_number' => $data['task_number'],
 			'private_flag' => $data['private_flag'],
@@ -60,6 +63,15 @@ class Issue extends Model implements AuditableContract
 		$issue->save();
 
 		return $issue;
+	}
+
+	public static function findIssueByTeacherSubjectId(string $teacherSubjectId)
+	{
+		$issues = self::where('teacher_subject_id', $teacherSubjectId)
+			->with('issueClasses.schoolClass')
+			->get();
+
+		return $issues;
 	}
 
 	public static function updateIssue($data): Issue
