@@ -9,6 +9,7 @@ use App\Models\Issue;
 use App\Models\IssueClass;
 use App\Models\IssueDepartment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class IssueManagementController extends Controller
 {
@@ -31,7 +32,8 @@ class IssueManagementController extends Controller
 	private function validateUpdateIssue(Request $request): array
 	{
 		$validatedData = $request->validate([
-			'teacher_subject_id' => 'sometimes|string|exists:teacher_subjects,teacher_subject_id',
+			'issue_id' => 'required|string|exists:issues,issue_id',
+			'teacher_subject_id' => 'required|string|exists:teacher_subjects,teacher_subject_id',
 			'name' => 'sometimes|string',
 			'due_dates' => 'sometimes|array',
 			'comment' => 'sometimes|string',
@@ -103,31 +105,14 @@ class IssueManagementController extends Controller
 	{
 		try {
 			$validatedData = $this->validateUpdateIssue($request);
-
-			// $validationDataにvalueがあるものだけ更新する
-			$issue = Issue::updateIssue([
-				'issue_id' => $request->issue_id,
-				'teacher_subject_id' => $validatedData['teacher_subject_id'] ?? null,
-				'name' => $validatedData['name'] ?? null,
-				'comment' => $validatedData['comment'] ?? null,
-				'task_number' => $validatedData['task_number'] ?? null,
-				'private_flag' => $validatedData['private_flag'] ?? null,
-				'challenge_flag' => $validatedData['challenge_flag'] ?? null,
-				'challenge_max_score' => $validatedData['challenge_max_score'] ?? null,
-			]);
+			$issue = Issue::updateIssue($validatedData);
+			$teacher_subject_id = $validatedData['teacher_subject_id'];
 
 			if (isset($validatedData['due_dates'])) {
 				foreach ($validatedData['due_dates'] as $data) {
-					// $dataにissue_class_idがあれば更新、なければ新規登録
 					if (isset($data['issue_class_id'])) {
 						IssueClass::updateIssueClass([
 							'issue_class_id' => $data['issue_class_id'],
-							'issue_id' => $issue->issue_id,
-							'class_id' => $data['class_id'],
-							'due_date' => $data['due_date'],
-						]);
-					} else {
-						IssueClass::registerNewIssueClass([
 							'issue_id' => $issue->issue_id,
 							'class_id' => $data['class_id'],
 							'due_date' => $data['due_date'],
@@ -136,7 +121,9 @@ class IssueManagementController extends Controller
 				}
 			}
 
-			return response()->json($issue, 201);
+			$issues = IssueResource::collection(Issue::findIssueByTeacherSubjectId($teacher_subject_id));
+
+			return response()->json($issues, 201);
 		} catch (\Exception $e) {
 			return response()->json(['error' => $e->getMessage()], 400);
 		}
