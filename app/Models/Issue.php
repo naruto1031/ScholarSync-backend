@@ -78,7 +78,24 @@ class Issue extends Model implements AuditableContract
 	{
 		$issue = self::where('issue_id', $data['issue_id'])->first();
 
-		$issue->fill($data);
+		// 受け取ったデータのキーごとに存在チェックを行う
+		$updateData = [];
+		$keys = [
+			'name',
+			'comment',
+			'task_number',
+			'private_flag',
+			'challenge_flag',
+			'challenge_max_score',
+		];
+		foreach ($keys as $key) {
+			if (isset($data[$key])) {
+				$updateData[$key] = $data[$key];
+			}
+		}
+
+		// 存在するキーのみでモデルを更新
+		$issue->fill($updateData);
 
 		$issue->save();
 

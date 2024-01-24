@@ -39,7 +39,6 @@ class SubjectManagementController extends Controller
 		DB::beginTransaction();
 		try {
 			$validatedData = $this->validateSubject($request);
-			Log::info('aaa');
 
 			$subject = Subject::registerNewSubject([
 				'name' => $validatedData['name'],
@@ -54,7 +53,6 @@ class SubjectManagementController extends Controller
 			DB::commit();
 		} catch (\Exception $e) {
 			DB::rollback();
-			Log::error($e->getMessage());
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
 
@@ -86,7 +84,6 @@ class SubjectManagementController extends Controller
 			return response()->json(['message' => 'Subject updated successfully'], 201);
 		} catch (\Exception $e) {
 			DB::rollback();
-			Log::error($e->getMessage());
 			return response()->json(['message' => 'Failed to update subject'], 400);
 		}
 	}
