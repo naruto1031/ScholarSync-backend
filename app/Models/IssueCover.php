@@ -81,6 +81,7 @@ class IssueCover extends Model implements AuditableContract
 		$studentClassId = optional($student->schoolClass)->class_id;
 
 		$issues = Issue::whereNotIn('issue_id', $submittedIssueIds)
+			->where('private_flag', 0)
 			->with(['teacherSubject.subject', 'issueClasses'])
 			->get()
 			->map(function ($issue) use ($studentClassId) {
