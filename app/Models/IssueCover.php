@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use App\Traits\AuditableCustom;
+use Illuminate\Support\Facades\Log;
 
 class IssueCover extends Model implements AuditableContract
 {
@@ -71,24 +72,26 @@ class IssueCover extends Model implements AuditableContract
 
 	public static function findNotSubmittedByStudentId($studentId)
 	{
-		$issueIds = self::where('student_id', $studentId)->pluck('issue_id');
-		$student = Student::where('student_id', $studentId)
-			->with('schoolClass.department')
-			->first();
+		$submittedIssueIds = self::where('student_id', $studentId)->pluck('issue_id');
 
-		$studentDepartmentId = optional($student->schoolClass)->department_id;
+		$student = Student::with('schoolClass.department')
+			->where('student_id', $studentId)
+			->firstOrFail();
 
-		$departmentIssueIds = IssueDepartment::where('department_id', $studentDepartmentId)->pluck(
-			'issue_id'
-		);
+		$studentClassId = optional($student->schoolClass)->class_id;
 
-		$issues = Issue::whereNotIn('issue_id', $issueIds)
-			->whereIn('issue_id', $departmentIssueIds)
-			->with(['teacherSubject.subject'])
+		$issues = Issue::whereNotIn('issue_id', $submittedIssueIds)
+			->where('private_flag', 0)
+			->with(['teacherSubject.subject', 'issueClasses'])
 			->get()
-			->map(function ($issue) {
-				$issue->subject_name = $issue->teacherSubject->subject->name;
-				unset($issue->teacherSubject, $issue->created_at, $issue->updated_at);
+			->map(function ($issue) use ($studentClassId) {
+				$issue->subject_name = optional($issue->teacherSubject->subject)->name;
+				$issue->due_date = optional(
+					$issue->issueClasses->where('class_id', $studentClassId)->first()
+				)->due_date;
+
+				unset($issue->teacherSubject, $issue->issueClasses, $issue->created_at, $issue->updated_at);
+
 				return $issue;
 			});
 
