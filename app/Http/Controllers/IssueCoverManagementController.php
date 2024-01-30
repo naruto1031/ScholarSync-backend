@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\IssueCover;
 use App\Models\IssueCoverStatus;
+use App\Models\SchoolClass;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\IssueCoverResource;
 use App\Http\Resources\NotSubmittedIssueCoverResource;
+use App\Http\Resources\SearchConditionIssueCoverResource;
 
 class IssueCoverManagementController extends Controller
 {
@@ -34,6 +36,18 @@ class IssueCoverManagementController extends Controller
 	{
 		$validatedData = $request->validate([
 			'statuses' => 'required|array',
+		]);
+		return $validatedData;
+	}
+
+	private function validatedSearchIssueCoverByIssueId(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'issue_id' => 'required|string|exists:issues,issue_id',
+			'class_id' => 'required|string|exists:school_classes,class_id',
+			'status' => 'required|string',
+			'student_numbers' => 'sometimes|array',
+			'exclude_student_numbers' => 'sometimes|array',
 		]);
 		return $validatedData;
 	}
@@ -95,6 +109,20 @@ class IssueCoverManagementController extends Controller
 				);
 				$issueCovers = $issueCovers->merge($notSubmittedIssueCovers);
 			}
+			return response()->json(['issue_covers' => $issueCovers], 200);
+		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function searchIssueCoverByIssueId(Request $request)
+	{
+		try {
+			$validatedData = $this->validatedSearchIssueCoverByIssueId($request);
+
+			$issueCovers = SearchConditionIssueCoverResource::collection(
+				IssueCover::findBySearchCondition($validatedData)
+			);
 			return response()->json(['issue_covers' => $issueCovers], 200);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);

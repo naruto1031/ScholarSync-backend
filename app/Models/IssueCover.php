@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use App\Traits\AuditableCustom;
-use Illuminate\Support\Facades\Log;
 
 class IssueCover extends Model implements AuditableContract
 {
@@ -70,7 +69,7 @@ class IssueCover extends Model implements AuditableContract
 		return $data;
 	}
 
-	public static function findNotSubmittedByStudentId($studentId)
+	public static function findNotSubmittedByStudentId(string $studentId)
 	{
 		$submittedIssueIds = self::where('student_id', $studentId)->pluck('issue_id');
 
@@ -96,5 +95,21 @@ class IssueCover extends Model implements AuditableContract
 			});
 
 		return $issues;
+	}
+
+	public static function findBySearchCondition(array $searchData)
+	{
+		$issueCovers = self::select('issue_cover_id', 'issue_id', 'comment', 'student_id')
+			->whereHas('issueCoverStatus', function ($query) use ($searchData) {
+				$query->where('status', $searchData['status']);
+			})
+			->whereHas('student', function ($query) use ($searchData) {
+				$query->where('class_id', $searchData['class_id']);
+			})
+			->where('issue_id', $searchData['issue_id'])
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
 	}
 }
