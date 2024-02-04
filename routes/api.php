@@ -85,6 +85,16 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::put('/issue/{issue_id}', [IssueManagementController::class, 'updateIssue']);
 	Route::delete('/issue/{issue_id}', [IssueManagementController::class, 'deleteIssue']);
 
+	//課題表紙情報
+	Route::post('/teacher/issue/cover', [
+		IssueCoverManagementController::class,
+		'searchIssueCoverByIssueId',
+	]);
+	Route::put('/teacher/issue/cover/collective', [
+		IssueCoverManagementController::class,
+		'updateCollectiveIssueCovers',
+	]);
+
 	// 学科情報
 	Route::get('/teacher/department', [DepartmentManagementController::class, 'getDepartmentList']);
 

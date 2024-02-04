@@ -70,7 +70,7 @@ class IssueCover extends Model implements AuditableContract
 		return $data;
 	}
 
-	public static function findNotSubmittedByStudentId($studentId)
+	public static function findNotSubmittedByStudentId(string $studentId)
 	{
 		$submittedIssueIds = self::where('student_id', $studentId)->pluck('issue_id');
 
@@ -96,5 +96,42 @@ class IssueCover extends Model implements AuditableContract
 			});
 
 		return $issues;
+	}
+
+	public static function findBySearchCondition(array $searchData)
+	{
+		$issueCovers = self::select('issue_cover_id', 'issue_id', 'comment', 'student_id')
+			->whereHas('issueCoverStatus', function ($query) use ($searchData) {
+				$query->where('status', $searchData['status']);
+			})
+			->whereHas('student', function ($query) use ($searchData) {
+				$query->where('class_id', $searchData['class_id']);
+			})
+			->where('issue_id', $searchData['issue_id'])
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
+
+	public static function findIssueCoverByIssueCoverId(array $issueCoverIds)
+	{
+		$issueCovers = self::whereIn('issue_cover_id', $issueCoverIds)
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
+
+	public static function updateIssueCoverStatus($issueCoverId, $status, $evaluation = null)
+	{
+		$issueCover = self::find($issueCoverId);
+		$issueCover->issueCoverStatus->status = $status;
+		if ($evaluation) {
+			$issueCover->issueCoverStatus->evaluation = $evaluation;
+		}
+		$issueCover->issueCoverStatus->save();
+		Log::info($issueCover);
+		return $issueCover;
 	}
 }

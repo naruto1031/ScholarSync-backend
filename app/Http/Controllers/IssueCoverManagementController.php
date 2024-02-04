@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\IssueCover;
 use App\Models\IssueCoverStatus;
+use App\Models\SchoolClass;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\IssueCoverResource;
 use App\Http\Resources\NotSubmittedIssueCoverResource;
+use App\Http\Resources\SearchConditionIssueCoverResource;
+use Illuminate\Support\Facades\Log;
 
 class IssueCoverManagementController extends Controller
 {
@@ -34,6 +37,29 @@ class IssueCoverManagementController extends Controller
 	{
 		$validatedData = $request->validate([
 			'statuses' => 'required|array',
+		]);
+		return $validatedData;
+	}
+
+	private function validatedSearchIssueCoverByIssueId(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'issue_id' => 'required|string|exists:issues,issue_id',
+			'class_id' => 'required|string|exists:school_classes,class_id',
+			'status' => 'required|string',
+			'student_numbers' => 'sometimes|array',
+			'exclude_student_numbers' => 'sometimes|array',
+		]);
+		return $validatedData;
+	}
+
+	private function validatedCollectiveUpdateIssueCovers(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'issue_cover_ids' => 'required|array',
+			'issue_cover_ids.*' => 'required|string|exists:issue_covers,issue_cover_id',
+			'status' => 'required|string',
+			'evaluation' => 'sometimes|string',
 		]);
 		return $validatedData;
 	}
@@ -101,6 +127,20 @@ class IssueCoverManagementController extends Controller
 		}
 	}
 
+	public function searchIssueCoverByIssueId(Request $request)
+	{
+		try {
+			$validatedData = $this->validatedSearchIssueCoverByIssueId($request);
+
+			$issueCovers = SearchConditionIssueCoverResource::collection(
+				IssueCover::findBySearchCondition($validatedData)
+			);
+			return response()->json(['issue_covers' => $issueCovers], 200);
+		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
 	public function getNotSubmittedIssueCover(Request $request)
 	{
 		try {
@@ -108,6 +148,32 @@ class IssueCoverManagementController extends Controller
 			$issues = IssueCover::findNotSubmittedByStudentId($studentId);
 			return response()->json(['issues' => $issues], 200);
 		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function updateCollectiveIssueCovers(Request $request)
+	{
+		try {
+			DB::beginTransaction();
+			$validatedData = $this->validatedCollectiveUpdateIssueCovers($request);
+			foreach ($validatedData['issue_cover_ids'] as $issueCoverId) {
+				IssueCover::updateIssueCoverStatus(
+					$issueCoverId,
+					$validatedData['status'],
+					$validatedData['evaluation'] ?? null
+				);
+			}
+
+			Log::info($validatedData);
+
+			$issueCovers = SearchConditionIssueCoverResource::collection(
+				IssueCover::findIssueCoverByIssueCoverId($validatedData['issue_cover_ids'])
+			);
+			DB::commit();
+			return response()->json(['issue_covers' => $issueCovers], 200);
+		} catch (\Exception $e) {
+			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
 	}
