@@ -90,6 +90,10 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 		IssueCoverManagementController::class,
 		'searchIssueCoverByIssueId',
 	]);
+	Route::put('/teacher/issue/cover/collective', [
+		IssueCoverManagementController::class,
+		'updateCollectiveIssueCovers',
+	]);
 
 	// 学科情報
 	Route::get('/teacher/department', [DepartmentManagementController::class, 'getDepartmentList']);

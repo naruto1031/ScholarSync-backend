@@ -18,7 +18,6 @@ class SearchConditionIssueCoverResource extends JsonResource
 			'issue_cover_id' => $this->issue_cover_id,
 			'issue_id' => $this->issue_id,
 			'comment' => $this->comment,
-			'student_id' => $this->student_id,
 			'student_name' => $this->student->name,
 			'registration_number' => $this->student->registration_number,
 			'attendance_number' => $this->student->attendance_number,

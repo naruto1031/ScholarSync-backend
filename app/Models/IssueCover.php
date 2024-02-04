@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use App\Traits\AuditableCustom;
+use Illuminate\Support\Facades\Log;
 
 class IssueCover extends Model implements AuditableContract
 {
@@ -111,5 +112,26 @@ class IssueCover extends Model implements AuditableContract
 			->get();
 
 		return $issueCovers;
+	}
+
+	public static function findIssueCoverByIssueCoverId(array $issueCoverIds)
+	{
+		$issueCovers = self::whereIn('issue_cover_id', $issueCoverIds)
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
+
+	public static function updateIssueCoverStatus($issueCoverId, $status, $evaluation = null)
+	{
+		$issueCover = self::find($issueCoverId);
+		$issueCover->issueCoverStatus->status = $status;
+		if ($evaluation) {
+			$issueCover->issueCoverStatus->evaluation = $evaluation;
+		}
+		$issueCover->issueCoverStatus->save();
+		Log::info($issueCover);
+		return $issueCover;
 	}
 }
