@@ -14,6 +14,7 @@ class SchoolClassManagementController extends Controller
 		$validatedData = $request->validate([
 			'name' => 'required|string|unique:school_classes,name',
 			'department_id' => 'required|string|exists:departments,department_id',
+			'student_count' => 'required|integer',
 		]);
 
 		return $validatedData;
@@ -23,6 +24,7 @@ class SchoolClassManagementController extends Controller
 	{
 		$validatedData = $request->validate([
 			'name' => 'required|string|unique:school_classes,name',
+			'student_count' => 'required|integer',
 		]);
 
 		return $validatedData;

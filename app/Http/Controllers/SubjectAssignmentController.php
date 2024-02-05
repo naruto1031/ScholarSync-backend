@@ -64,9 +64,6 @@ class SubjectAssignmentController extends Controller
 		}
 
 		$teacherSubjects = TeacherSubject::withSubject($teacher_id)->get();
-		// SQLを取得する
-
-		DB::enableQueryLog();
 
 		$formattedSubjects = $teacherSubjects->map(function ($teacherSubject) {
 			return [
@@ -89,7 +86,6 @@ class SubjectAssignmentController extends Controller
 					}),
 			];
 		});
-		Log::debug(DB::getQueryLog());
 		return response()->json($formattedSubjects);
 	}
 }

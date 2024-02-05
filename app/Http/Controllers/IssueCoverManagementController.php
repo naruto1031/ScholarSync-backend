@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Resources\IssueCoverResource;
 use App\Http\Resources\NotSubmittedIssueCoverResource;
 use App\Http\Resources\SearchConditionIssueCoverResource;
+use App\Http\Resources\TeacherNotSubmittedIssueCoverResource;
 use Illuminate\Support\Facades\Log;
 
 class IssueCoverManagementController extends Controller
@@ -47,8 +48,8 @@ class IssueCoverManagementController extends Controller
 			'issue_id' => 'required|string|exists:issues,issue_id',
 			'class_id' => 'required|string|exists:school_classes,class_id',
 			'status' => 'required|string',
-			'student_numbers' => 'sometimes|array',
-			'exclude_student_numbers' => 'sometimes|array',
+			'attendance_numbers' => 'sometimes|array',
+			'exclude_attendance_numbers' => 'sometimes|array',
 		]);
 		return $validatedData;
 	}
@@ -60,6 +61,8 @@ class IssueCoverManagementController extends Controller
 			'issue_cover_ids.*' => 'required|string|exists:issue_covers,issue_cover_id',
 			'status' => 'required|string',
 			'evaluation' => 'sometimes|string',
+			'resubmission_deadline' => 'sometimes|string',
+			'resubmission_comment' => 'sometimes|string',
 		]);
 		return $validatedData;
 	}
@@ -132,6 +135,13 @@ class IssueCoverManagementController extends Controller
 		try {
 			$validatedData = $this->validatedSearchIssueCoverByIssueId($request);
 
+			if ($validatedData['status'] === 'not_submitted') {
+				$issueCovers = TeacherNotSubmittedIssueCoverResource::collection(
+					IssueCover::findNotSubmittedByIssueIdAndClassId($validatedData)
+				);
+				return response()->json(['issue_covers' => $issueCovers], 200);
+			}
+
 			$issueCovers = SearchConditionIssueCoverResource::collection(
 				IssueCover::findBySearchCondition($validatedData)
 			);
@@ -161,11 +171,11 @@ class IssueCoverManagementController extends Controller
 				IssueCover::updateIssueCoverStatus(
 					$issueCoverId,
 					$validatedData['status'],
-					$validatedData['evaluation'] ?? null
+					$validatedData['evaluation'] ?? null,
+					$validatedData['resubmission_deadline'] ?? null,
+					$validatedData['resubmission_comment'] ?? null
 				);
 			}
-
-			Log::info($validatedData);
 
 			$issueCovers = SearchConditionIssueCoverResource::collection(
 				IssueCover::findIssueCoverByIssueCoverId($validatedData['issue_cover_ids'])
