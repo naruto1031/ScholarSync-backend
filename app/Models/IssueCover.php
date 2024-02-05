@@ -70,7 +70,7 @@ class IssueCover extends Model implements AuditableContract
 		return $data;
 	}
 
-	public static function findNotSubmittedByStudentId($studentId)
+	public static function findNotSubmittedByStudentId(string $studentId)
 	{
 		$submittedIssueIds = self::where('student_id', $studentId)->pluck('issue_id');
 
@@ -96,5 +96,75 @@ class IssueCover extends Model implements AuditableContract
 			});
 
 		return $issues;
+	}
+
+	public static function findBySearchCondition(array $searchData)
+	{
+		$issueCovers = self::select('issue_cover_id', 'issue_id', 'comment', 'student_id')
+			->whereHas('issueCoverStatus', function ($query) use ($searchData) {
+				$query->where('status', $searchData['status']);
+			})
+			->whereHas('student', function ($query) use ($searchData) {
+				$query->where('class_id', $searchData['class_id']);
+				if (
+					isset($searchData['attendance_numbers']) &&
+					count($searchData['attendance_numbers']) > 0
+				) {
+					$query->whereIn('attendance_number', $searchData['attendance_numbers']);
+				}
+				if (
+					isset($searchData['exclude_attendance_numbers']) &&
+					count($searchData['exclude_attendance_numbers']) > 0
+				) {
+					$query->whereNotIn('attendance_number', $searchData['exclude_attendance_numbers']);
+				}
+			})
+			->where('issue_id', $searchData['issue_id'])
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
+
+	public static function findNotSubmittedByIssueIdAndClassId(array $searchData)
+	{
+		$submittedStudentIds = self::where('issue_id', $searchData['issue_id'])->pluck('student_id');
+
+		$notSubmittedStudents = Student::where('class_id', $searchData['class_id'])
+			->whereNotIn('student_id', $submittedStudentIds)
+			->with('schoolClass.department')
+			->get();
+		return $notSubmittedStudents;
+	}
+
+	public static function findIssueCoverByIssueCoverId(array $issueCoverIds)
+	{
+		$issueCovers = self::whereIn('issue_cover_id', $issueCoverIds)
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
+
+	public static function updateIssueCoverStatus(
+		$issueCoverId,
+		$status,
+		$evaluation = null,
+		$resubmissionDeadline = null,
+		$resubmissionComment = null
+	) {
+		$issueCover = self::find($issueCoverId);
+		$issueCover->issueCoverStatus->status = $status;
+		if ($evaluation) {
+			$issueCover->issueCoverStatus->evaluation = $evaluation;
+		}
+		if ($resubmissionDeadline) {
+			$issueCover->issueCoverStatus->resubmission_deadline = $resubmissionDeadline;
+		}
+		if ($resubmissionComment) {
+			$issueCover->issueCoverStatus->resubmission_comment = $resubmissionComment;
+		}
+		$issueCover->issueCoverStatus->save();
+		return $issueCover;
 	}
 }

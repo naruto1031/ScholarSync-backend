@@ -53,6 +53,7 @@ entity "担当教科" as teacher_subject {
 entity "課題" as issue {
   + 課題ID <<PK>>
   --
+  # 担当教科ID <<FK>>
   課題名
   課題ナンバー
   コメント

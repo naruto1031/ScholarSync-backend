@@ -18,7 +18,7 @@ class SchoolClass extends Model implements AuditableContract
 	}
 
 	protected $primaryKey = 'class_id';
-	protected $fillable = ['department_id', 'name'];
+	protected $fillable = ['department_id', 'name', 'student_count'];
 
 	public function department(): BelongsTo
 	{

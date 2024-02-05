@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Student;
 use App\Models\SchoolClass;
+use Illuminate\Support\Facades\Log;
 
 class StudentManagementController extends Controller
 {

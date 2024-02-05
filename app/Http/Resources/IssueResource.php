@@ -25,6 +25,7 @@ class IssueResource extends JsonResource
 					'due_date' => $issueClass->due_date,
 					'department_name' => $issueClass->schoolClass->department->name,
 					'class_name' => $issueClass->schoolClass->name,
+					'student_count' => $issueClass->schoolClass->student_count,
 				];
 			}),
 			'created_at' => $this->created_at,
