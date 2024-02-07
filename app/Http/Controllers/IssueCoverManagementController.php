@@ -67,6 +67,19 @@ class IssueCoverManagementController extends Controller
 		return $validatedData;
 	}
 
+	private function validatedIndividualUpdateIssueCover(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'issue_cover_id' => 'required|string|exists:issue_covers,issue_cover_id',
+			'status' => 'required|string',
+			'evaluation' => 'sometimes|string',
+			'current_score' => 'sometimes|int',
+			'resubmission_deadline' => 'sometimes|string',
+			'resubmission_comment' => 'sometimes|string',
+		]);
+		return $validatedData;
+	}
+
 	public function registerIssueCover(Request $request)
 	{
 		DB::beginTransaction();
@@ -182,6 +195,30 @@ class IssueCoverManagementController extends Controller
 			);
 			DB::commit();
 			return response()->json(['issue_covers' => $issueCovers], 200);
+		} catch (\Exception $e) {
+			DB::rollBack();
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function updateIndividualIssueCover(Request $request)
+	{
+		try {
+			DB::beginTransaction();
+			$validatedData = $this->validatedIndividualUpdateIssueCover($request);
+			IssueCover::updateIssueCover(
+				$validatedData['issue_cover_id'],
+				$validatedData['status'],
+				$validatedData['evaluation'] ?? null,
+				$validatedData['resubmission_deadline'] ?? null,
+				$validatedData['resubmission_comment'] ?? null,
+				$validatedData['current_score'] ?? null
+			);
+			$issueCover = SearchConditionIssueCoverResource::collection(
+				IssueCover::findIssueCoverByIssueCoverId([$validatedData['issue_cover_id']])
+			);
+			DB::commit();
+			return response()->json(['issue_covers' => $issueCover], 200);
 		} catch (\Exception $e) {
 			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 400);

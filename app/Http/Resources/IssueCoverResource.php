@@ -20,7 +20,7 @@ class IssueCoverResource extends JsonResource
 			'subject' => $this->issue->teacherSubject->subject->name,
 			'task_number' => $this->issue->task_number,
 			'name' => $this->issue->name,
-			'due_date' => $this->issue->due_date,
+			'due_date' => $this->due_date,
 			'comment' => $this->comment,
 			'status' => $this->issueCoverStatus->status,
 			'evaluation' => $this->issueCoverStatus->evaluation,
