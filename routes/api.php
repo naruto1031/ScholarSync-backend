@@ -9,6 +9,7 @@ use App\Http\Controllers\ClassTeacherAssignmentController;
 use App\Http\Controllers\IssueManagementController;
 use App\Http\Controllers\IssueCoverManagementController;
 use App\Http\Controllers\StudentManagementController;
+use App\Models\Issue;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 Route::middleware(['jwt.verify', 'student'])->group(function () {
 	// 生徒情報
 	Route::post('/student/register', [StudentManagementController::class, 'registerStudent']);
@@ -93,6 +95,10 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::put('/teacher/issue/cover/collective', [
 		IssueCoverManagementController::class,
 		'updateCollectiveIssueCovers',
+	]);
+	Route::put('/teacher/issue/cover/individual', [
+		IssueCoverManagementController::class,
+		'updateIndividualIssueCover',
 	]);
 
 	// 学科情報
