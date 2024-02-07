@@ -57,15 +57,41 @@ class IssueCover extends Model implements AuditableContract
 		$issueCover->delete();
 	}
 
-	public static function findByStatusesAndStudentId(array $statuses, $student_id)
+	public static function findByStatusesAndStudentId(array $statuses, $studentId)
 	{
+		$student = Student::with('schoolClass.department')
+			->where('student_id', $studentId)
+			->firstOrFail();
+
+		$studentClassId = optional($student->schoolClass)->class_id;
 		$data = self::select('issue_cover_id', 'issue_id', 'comment')
-			->where('student_id', $student_id)
+			->where('student_id', $studentId)
 			->whereHas('issueCoverStatus', function ($query) use ($statuses) {
 				$query->whereIn('status', $statuses);
 			})
-			->with('issueCoverStatus', 'issue.teacherSubject.teacher', 'issue.teacherSubject.subject')
-			->get();
+			->with(
+				'issueCoverStatus',
+				'issue.teacherSubject.teacher',
+				'issue.teacherSubject.subject',
+				'issue.issueClasses'
+			)
+			->get()
+			->map(function ($issueCover) use ($studentClassId) {
+				$issueCover->subject_name = optional($issueCover->issue->teacherSubject->subject)->name;
+				$issueCover->due_date = optional(
+					$issueCover->issue->issueClasses->where('class_id', $studentClassId)->first()
+				)->due_date;
+				$issueCover->teacher_name = optional($issueCover->issue->teacherSubject->teacher)->name;
+
+				unset(
+					$issueCover->issue,
+					$issueCover->issueCoverStatus,
+					$issueCover->created_at,
+					$issueCover->updated_at
+				);
+
+				return $issueCover;
+			});
 
 		return $data;
 	}
@@ -161,8 +187,35 @@ class IssueCover extends Model implements AuditableContract
 		if ($resubmissionDeadline) {
 			$issueCover->issueCoverStatus->resubmission_deadline = $resubmissionDeadline;
 		}
+
 		if ($resubmissionComment) {
 			$issueCover->issueCoverStatus->resubmission_comment = $resubmissionComment;
+		}
+		$issueCover->issueCoverStatus->save();
+		return $issueCover;
+	}
+
+	public static function updateIssueCover(
+		$issue_cover_id,
+		$status,
+		$evaluation = null,
+		$resubmission_deadline = null,
+		$resubmission_comment = null,
+		$current_score = null
+	) {
+		$issueCover = self::find($issue_cover_id);
+		$issueCover->issueCoverStatus->status = $status;
+		if ($evaluation) {
+			$issueCover->issueCoverStatus->evaluation = $evaluation;
+		}
+		if ($resubmission_deadline) {
+			$issueCover->issueCoverStatus->resubmission_deadline = $resubmission_deadline;
+		}
+		if ($resubmission_comment) {
+			$issueCover->issueCoverStatus->resubmission_comment = $resubmission_comment;
+		}
+		if ($current_score !== null) {
+			$issueCover->issueCoverStatus->current_score = $current_score;
 		}
 		$issueCover->issueCoverStatus->save();
 		return $issueCover;
