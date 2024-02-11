@@ -9,6 +9,7 @@ use App\Http\Controllers\ClassTeacherAssignmentController;
 use App\Http\Controllers\IssueManagementController;
 use App\Http\Controllers\IssueCoverManagementController;
 use App\Http\Controllers\StudentManagementController;
+use App\Http\Controllers\DiscordGuildController;
 use App\Models\Issue;
 use Illuminate\Support\Facades\Route;
 
@@ -116,6 +117,9 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 
 	// クラス一覧
 	Route::get('/teacher/class', [SchoolClassManagementController::class, 'getClassList']);
+
+	// Discordギルド情報
+	Route::get('/discord/guild/{class_id}', [DiscordGuildController::class, 'findGuild']);
 });
 
 Route::middleware(['jwt.verify', 'admin'])->group(function () {

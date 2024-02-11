@@ -13,6 +13,12 @@ entity "クラス" as school_class {
   クラス名
 }
 
+entity "Discordギルド" as discord_guild {
+  + ギルドID <<PK>>
+  --
+  # クラスID <<FK>>
+}
+
 entity "生徒" as student {
   + 生徒ID <<PK>>
   --
@@ -81,7 +87,6 @@ entity "課題表紙状態" as issueCoverStatus {
   再提出コメント
 }
 
-' 新しく追加されたエンティティ
 entity "教科学科" as subject_department {
   + 教科学科ID <<PK>>
   --
@@ -104,8 +109,9 @@ department ||--o{ subject_department : 教科に関連
 school_class ||--o{ student : 所属生徒
 school_class ||--o{ class_teacher : 担任
 school_class ||--o{ issue_class : 課題に関連
+school_class ||--o{ discord_guild : 所属ギルド
 
-teacher ||--o{ class_teacher : 担任
+teacher ||--o{ class_teacher
 teacher ||--o{ teacher_subject : 担当教科
 
 subject ||--o{ teacher_subject : 担当教師
