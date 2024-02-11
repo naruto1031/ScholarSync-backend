@@ -58,6 +58,7 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::put('/teacher', [TeacherManagementController::class, 'updateTeacher']);
 	Route::delete('/teacher', [TeacherManagementController::class, 'deleteTeacher']);
 	Route::get('/teacher/exists', [TeacherManagementController::class, 'checkTeacherExists']);
+	Route::get('/teacher/info', [TeacherManagementController::class, 'findTeacherInfo']);
 
 	// 教科情報
 	Route::get('/teacher/subject', [SubjectManagementController::class, 'getSubjectList']);
