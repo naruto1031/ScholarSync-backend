@@ -43,4 +43,12 @@ class Teacher extends Model implements AuditableContract
 
 		return $teacher;
 	}
+
+	public static function findTeacherInfo(string $teacherId)
+	{
+		$data = self::find($teacherId)
+			->with('teacherSubjects.subject', 'classTeachers.schoolClass.department')
+			->get();
+		return $data;
+	}
 }
