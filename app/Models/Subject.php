@@ -45,7 +45,11 @@ class Subject extends Model
 
 	public static function findSubjectListByClassId(string $classId)
 	{
-		$departmentId = SchoolClass::find($classId)->department_id;
+		$schoolClass = SchoolClass::find($classId);
+		if (!$schoolClass) {
+			return [];
+		}
+		$departmentId = $schoolClass->department_id;
 		$subjects = self::join(
 			'subject_departments',
 			'subjects.subject_id',
