@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\IssueCoverClassResource;
 use Illuminate\Http\Request;
 use App\Models\IssueCover;
 use App\Models\IssueCoverStatus;
 use App\Models\SchoolClass;
+use App\Models\Issue;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\IssueCoverResource;
 use App\Http\Resources\NotSubmittedIssueCoverResource;
@@ -76,6 +78,15 @@ class IssueCoverManagementController extends Controller
 			'current_score' => 'sometimes|int',
 			'resubmission_deadline' => 'sometimes|string',
 			'resubmission_comment' => 'sometimes|string',
+		]);
+		return $validatedData;
+	}
+
+	private function validatedFindIssueCoverByClassIdAndSubjectId(Request $request): array
+	{
+		$validatedData = $request->validate([
+			'class_id' => 'required|string|exists:school_classes,class_id',
+			'subject_id' => 'required|string|exists:subjects,subject_id',
 		]);
 		return $validatedData;
 	}
@@ -221,6 +232,34 @@ class IssueCoverManagementController extends Controller
 			return response()->json(['issue_covers' => $issueCover], 200);
 		} catch (\Exception $e) {
 			DB::rollBack();
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function findIssueCoverByClassIdAndSubjectId(Request $request)
+	{
+		try {
+			$validatedData = $this->validatedFindIssueCoverByClassIdAndSubjectId($request);
+			$issues = Issue::findBySubjectId($validatedData['subject_id']);
+			$students = SchoolClass::find($validatedData['class_id'])->students;
+			$issueCovers = [];
+			foreach ($students as $student) {
+				$issueCovers[] = IssueCoverClassResource::collection(
+					IssueCover::findByStudentIdAndSubjectId(
+						$student->student_id,
+						$validatedData['subject_id']
+					)
+				);
+			}
+			return response()->json(
+				[
+					'issues' => $issues,
+					'students' => $students,
+					'issue_covers' => $issueCovers,
+				],
+				200
+			);
+		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
 	}
