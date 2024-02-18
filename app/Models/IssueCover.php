@@ -220,4 +220,21 @@ class IssueCover extends Model implements AuditableContract
 		$issueCover->issueCoverStatus->save();
 		return $issueCover;
 	}
+
+	public static function findByStudentIdAndSubjectId($studentId, $subjectId)
+	{
+		$teacherSubjectIds = TeacherSubject::select('teacher_subject_id')
+			->where('subject_id', $subjectId)
+			->get()
+			->pluck('teacher_subject_id');
+
+		$issueCovers = self::where('student_id', $studentId)
+			->whereHas('issue', function ($query) use ($teacherSubjectIds) {
+				$query->whereIn('teacher_subject_id', $teacherSubjectIds);
+			})
+			->with('issueCoverStatus', 'student')
+			->get();
+
+		return $issueCovers;
+	}
 }

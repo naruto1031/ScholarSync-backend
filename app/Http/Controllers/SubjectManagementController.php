@@ -108,4 +108,10 @@ class SubjectManagementController extends Controller
 		});
 		return response()->json($subjects);
 	}
+
+	public function getSubjectListByClassId(string $classId): JsonResponse
+	{
+		$subjects = Subject::findSubjectListByClassId($classId);
+		return response()->json($subjects);
+	}
 }

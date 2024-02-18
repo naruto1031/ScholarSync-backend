@@ -54,6 +54,7 @@ entity "担当教科" as teacher_subject {
   --
   # 教師ID <<FK>>
   # 教科ID <<FK>>
+  担当年度
 }
 
 entity "課題" as issue {
@@ -102,6 +103,14 @@ entity "課題クラス" as issue_class {
   納期
 }
 
+entity "生徒クラス履歴" as student_class_history {
+  + 履歴ID <<PK>>
+  --
+  # 生徒ID <<FK>>
+  # クラスID <<FK>>
+  年度
+}
+
 ' エンティティ間の関係
 department ||--o{ school_class : 含まれるクラス
 department ||--o{ subject_department : 教科に関連
@@ -125,6 +134,9 @@ issue ||--o{ issue_class : 関連するクラス
 student ||--o{ issueCover : 提出
 
 issueCover ||--|| issueCoverStatus : 状態
+
+student ||--o{ student_class_history : 履歴
+school_class ||--o{ student_class_history : 履歴
 
 ' 線種を直交線に設定
 skinparam Linetype ortho

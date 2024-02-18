@@ -63,6 +63,8 @@ class ClassTeacherAssignmentController extends Controller
 				$departmentNameAndClassName = $departmentName . $className;
 				return [
 					'class_teacher_id' => $classTeacherAssignment->class_teacher_id,
+					'class_id' => $classTeacherAssignment->class_id,
+					'department_id' => $classTeacherAssignment->schoolClass->department_id,
 					'class_name' => $departmentNameAndClassName,
 				];
 			});

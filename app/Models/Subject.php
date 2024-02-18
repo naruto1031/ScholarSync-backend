@@ -42,4 +42,24 @@ class Subject extends Model
 
 		return $subject;
 	}
+
+	public static function findSubjectListByClassId(string $classId)
+	{
+		$schoolClass = SchoolClass::find($classId);
+		if (!$schoolClass) {
+			return [];
+		}
+		$departmentId = $schoolClass->department_id;
+		$subjects = self::join(
+			'subject_departments',
+			'subjects.subject_id',
+			'=',
+			'subject_departments.subject_id'
+		)
+			->where('subject_departments.department_id', $departmentId)
+			->select('subjects.*')
+			->get();
+
+		return $subjects;
+	}
 }
