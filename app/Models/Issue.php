@@ -101,4 +101,19 @@ class Issue extends Model implements AuditableContract
 
 		return $issue;
 	}
+
+	public static function findBySubjectId(string $subjectId)
+	{
+		$issues = self::join(
+			'teacher_subjects',
+			'issues.teacher_subject_id',
+			'=',
+			'teacher_subjects.teacher_subject_id'
+		)
+			->where('teacher_subjects.subject_id', $subjectId)
+			->select('issues.*')
+			->get();
+
+		return $issues;
+	}
 }

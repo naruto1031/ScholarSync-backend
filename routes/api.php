@@ -71,6 +71,11 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	]);
 	Route::get('/subject/assign', [SubjectAssignmentController::class, 'getSubjectList']);
 
+	Route::get('/subject/class/{class_id}', [
+		SubjectManagementController::class,
+		'getSubjectListByClassId',
+	]);
+
 	// 教師へのクラスの割り当て
 	Route::post('/class/assign', [ClassTeacherAssignmentController::class, 'assignClassToTeacher']);
 	Route::delete('/class/assign/{class_teacher}', [
@@ -114,6 +119,11 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 	Route::delete('/issue/department/assign/{issue_department}', [
 		IssueManagementController::class,
 		'deleteIssueDepartment',
+	]);
+
+	Route::post('/issue/class', [
+		IssueCoverManagementController::class,
+		'findIssueCoverByClassIdAndSubjectId',
 	]);
 
 	// クラス一覧
