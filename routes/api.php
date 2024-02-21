@@ -47,6 +47,11 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 		'deleteIssueCover',
 	]);
 
+	Route::put('/student/issue/cover', [
+		IssueCoverManagementController::class,
+		'updateIndividualIssueCover',
+	]);
+
 	// クラス一覧
 	Route::get('/student/class', [SchoolClassManagementController::class, 'getClassList']);
 });
