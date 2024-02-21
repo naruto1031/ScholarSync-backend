@@ -49,7 +49,7 @@ class IssueCoverManagementController extends Controller
 		$validatedData = $request->validate([
 			'issue_id' => 'required|string|exists:issues,issue_id',
 			'class_id' => 'required|string|exists:school_classes,class_id',
-			'status' => 'required|string',
+			'status' => 'sometimes|string',
 			'attendance_numbers' => 'sometimes|array',
 			'exclude_attendance_numbers' => 'sometimes|array',
 		]);
@@ -158,6 +158,17 @@ class IssueCoverManagementController extends Controller
 	{
 		try {
 			$validatedData = $this->validatedSearchIssueCoverByIssueId($request);
+
+			if ($validatedData['status'] === 'all') {
+				$issueCovers = SearchConditionIssueCoverResource::collection(
+					IssueCover::findAllSearchCondition($validatedData)
+				);
+				$notSubmittedIssueCovers = TeacherNotSubmittedIssueCoverResource::collection(
+					IssueCover::findNotSubmittedByIssueIdAndClassId($validatedData)
+				);
+				$issueCovers = $issueCovers->merge($notSubmittedIssueCovers);
+				return response()->json(['issue_covers' => $issueCovers], 200);
+			}
 
 			if ($validatedData['status'] === 'not_submitted') {
 				$issueCovers = TeacherNotSubmittedIssueCoverResource::collection(

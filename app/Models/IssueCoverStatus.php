@@ -24,6 +24,7 @@ class IssueCoverStatus extends Model implements AuditableContract
 	const STATUS_ABSENCE = 'absence'; // 公欠申請済み
 	const STATUS_PENDING_EXEMPTION = 'pending_exemption'; // 免除申請中
 	const STATUS_EXEMPTION = 'exemption'; // 免除申請済み
+	const STATUS_LATE_PENDING = 'late_pending'; // 課題表紙遅延承認待ち
 
 	protected $primaryKey = 'issue_cover_status_id';
 	protected $fillable = [
@@ -60,6 +61,7 @@ class IssueCoverStatus extends Model implements AuditableContract
 			self::STATUS_ABSENCE,
 			self::STATUS_PENDING_EXEMPTION,
 			self::STATUS_EXEMPTION,
+			self::STATUS_LATE_PENDING,
 		];
 	}
 
