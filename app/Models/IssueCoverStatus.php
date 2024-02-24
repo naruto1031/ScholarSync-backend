@@ -22,6 +22,7 @@ class IssueCoverStatus extends Model implements AuditableContract
 	const STATUS_APPROVED = 'approved'; // 課題表紙承認済み
 	const STATUS_PENDING_ABSENCE = 'pending_absence'; // 公欠申請中
 	const STATUS_ABSENCE = 'absence'; // 公欠申請済み
+	const STATUS_PENDING_EXEMPTION_APPROVAL = 'pending_exemption_approval'; // 免除申請許可待ち
 	const STATUS_PENDING_EXEMPTION = 'pending_exemption'; // 免除申請中
 	const STATUS_EXEMPTION = 'exemption'; // 免除申請済み
 	const STATUS_LATE_PENDING = 'late_pending'; // 課題表紙遅延承認待ち
@@ -62,6 +63,7 @@ class IssueCoverStatus extends Model implements AuditableContract
 			self::STATUS_PENDING_EXEMPTION,
 			self::STATUS_EXEMPTION,
 			self::STATUS_LATE_PENDING,
+			self::STATUS_PENDING_EXEMPTION_APPROVAL,
 		];
 	}
 

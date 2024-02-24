@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\IssueCoverClassResource;
+use App\Http\Resources\IssueCoverExemptionResource;
 use Illuminate\Http\Request;
 use App\Models\IssueCover;
 use App\Models\IssueCoverStatus;
@@ -270,6 +271,18 @@ class IssueCoverManagementController extends Controller
 				],
 				200
 			);
+		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
+
+	public function getExemptedIssueCoversByClassId(string $classId)
+	{
+		try {
+			$issueCovers = IssueCoverExemptionResource::collection(
+				IssueCover::getExemptedIssueCoversByClassId($classId)
+			);
+			return response()->json(['issue_covers' => $issueCovers], 200);
 		} catch (\Exception $e) {
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
