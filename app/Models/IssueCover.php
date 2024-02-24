@@ -262,4 +262,27 @@ class IssueCover extends Model implements AuditableContract
 
 		return $issueCovers;
 	}
+
+	public static function getExemptedIssueCoversByClassId($class_id)
+	{
+		$issueCovers = self::whereHas('student', function ($query) use ($class_id) {
+			$query->where('class_id', $class_id);
+		})
+			->whereHas('issueCoverStatus', function ($query) {
+				$query->where('status', 'pending_exemption_approval');
+			})
+			->with('issueCoverStatus', 'student', 'issue.issueClasses', 'issue.teacherSubject.subject')
+			->get()
+			->map(function ($issueCover) {
+				$issueCover->due_date = optional(
+					$issueCover->issue->issueClasses
+						->where('class_id', $issueCover->student->class_id)
+						->first()
+				)->due_date;
+
+				return $issueCover;
+			});
+
+		return $issueCovers;
+	}
 }
