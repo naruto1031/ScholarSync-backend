@@ -133,6 +133,10 @@ Route::middleware(['jwt.verify', 'teacher'])->group(function () {
 
 	// クラス一覧
 	Route::get('/teacher/class', [SchoolClassManagementController::class, 'getClassList']);
+	Route::get('/teacher/class/exemption/{class_id}', [
+		IssueCoverManagementController::class,
+		'getExemptedIssueCoversByClassId',
+	]);
 
 	// Discordギルド情報
 	Route::get('/discord/guild/{class_id}', [DiscordGuildController::class, 'findGuild']);
