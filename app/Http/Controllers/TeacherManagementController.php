@@ -49,10 +49,8 @@ class TeacherManagementController extends Controller
 			}
 			$validatedData['teacher_id'] = $teacher_id;
 			$teacher = Teacher::registerTeacher($validatedData);
-			Log::info($teacher);
 			return response()->json($teacher, 201);
 		} catch (\Exception $e) {
-			Log::error($e->getMessage());
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
 
