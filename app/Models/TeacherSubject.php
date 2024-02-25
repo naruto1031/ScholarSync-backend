@@ -18,7 +18,7 @@ class TeacherSubject extends Model implements AuditableContract
 	}
 
 	protected $primaryKey = 'teacher_subject_id';
-	protected $fillable = ['teacher_id', 'subject_id'];
+	protected $fillable = ['teacher_id', 'subject_id', 'academic_year'];
 
 	public function teacher(): BelongsTo
 	{

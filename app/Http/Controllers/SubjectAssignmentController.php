@@ -36,13 +36,14 @@ class SubjectAssignmentController extends Controller
 				$teacherSubject = new TeacherSubject([
 					'teacher_id' => $teacherId,
 					'subject_id' => $subjectId,
+					'academic_year' => 2024,
 				]);
 				$teacherSubject->save();
 			}
 			DB::commit();
 		} catch (\Exception $e) {
 			DB::rollback();
-			return response()->json(['message' => 'Subject assignment failed'], 400);
+			return response()->json(['message' => $e->getMessage()], 400);
 		}
 		return response()->json($teacherSubject, 201);
 	}
