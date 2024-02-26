@@ -287,4 +287,16 @@ class IssueCoverManagementController extends Controller
 			return response()->json(['message' => $e->getMessage()], 400);
 		}
 	}
+
+	public function getIssueCoverStatusCount(Request $request)
+	{
+		try {
+			$studentId = $request->attributes->get('jwt_sub');
+			$issueCoverStatusCount = IssueCover::getIssueCoverStatusCount($studentId);
+
+			return response()->json(['issue_cover_status_count' => $issueCoverStatusCount], 200);
+		} catch (\Exception $e) {
+			return response()->json(['message' => $e->getMessage()], 400);
+		}
+	}
 }
