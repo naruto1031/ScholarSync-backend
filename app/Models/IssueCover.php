@@ -285,4 +285,20 @@ class IssueCover extends Model implements AuditableContract
 
 		return $issueCovers;
 	}
+
+	public static function getIssueCoverStatusCount($student_id)
+	{
+		$issueCoverStatusCount = self::where('student_id', $student_id)
+			->with('issueCoverStatus')
+			->get()
+			->groupBy('issueCoverStatus.status')
+			->map(function ($issueCovers) {
+				return $issueCovers->count();
+			});
+
+		$class_id = Student::where('student_id', $student_id)->first()->class_id;
+		$issueClassCount = IssueClass::where('class_id', $class_id)->count();
+		$issueCoverStatusCount['total'] = $issueClassCount;
+		return $issueCoverStatusCount;
+	}
 }

@@ -37,6 +37,7 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 		IssueCoverManagementController::class,
 		'getNotSubmittedIssueCover',
 	]);
+
 	Route::post('/issue/cover/register', [
 		IssueCoverManagementController::class,
 		'registerIssueCover',
@@ -45,6 +46,10 @@ Route::middleware(['jwt.verify', 'student'])->group(function () {
 	Route::delete('/issue/cover/{issue_cover}', [
 		IssueCoverManagementController::class,
 		'deleteIssueCover',
+	]);
+	Route::get('/issue/cover/count', [
+		IssueCoverManagementController::class,
+		'getIssueCoverStatusCount',
 	]);
 
 	Route::put('/student/issue/cover', [
