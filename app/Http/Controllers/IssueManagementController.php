@@ -133,20 +133,9 @@ class IssueManagementController extends Controller
 	{
 		try {
 			$issue = Issue::find($issue_id);
-			if ($isPhysicalDeletion) {
-				$issue->delete(); // 物理削除
-				return response()->json(
-					['message' => 'Issue deleted successfully (physical deletion)'],
-					201
-				);
-			} else {
-				$issue->private_flag = true; // 論理削除
-				$issue->save();
-				return response()->json(
-					['message' => 'Issue deleted successfully (logical deletion)'],
-					201
-				);
-			}
+			$issue->delete(); // 物理削除
+
+			return response()->json(['message' => 'Issue deleted successfully (physical deletion)'], 201);
 		} catch (\Exception $e) {
 			return response()->json(['error' => $e->getMessage()], 400);
 		}
