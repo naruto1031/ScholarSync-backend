@@ -129,11 +129,11 @@ class IssueManagementController extends Controller
 		}
 	}
 
-	public function deleteIssue(string $issue_id, bool $isPhysicalDeletion = false): JsonResponse
+	public function deleteIssue(string $issue_id): JsonResponse
 	{
 		try {
 			$issue = Issue::find($issue_id);
-			$issue->delete(); // 物理削除
+			$issue->delete();
 
 			return response()->json(['message' => 'Issue deleted successfully (physical deletion)'], 201);
 		} catch (\Exception $e) {
