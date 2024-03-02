@@ -57,8 +57,11 @@ class IssueCover extends Model implements AuditableContract
 		$issueCover->delete();
 	}
 
-	public static function findByStatusesAndStudentId(array $statuses, $studentId)
-	{
+	public static function findByStatusesAndStudentIdAndSubjectId(
+		array $statuses,
+		$studentId,
+		$subjectId
+	) {
 		$student = Student::with('schoolClass.department')
 			->where('student_id', $studentId)
 			->firstOrFail();
@@ -66,8 +69,15 @@ class IssueCover extends Model implements AuditableContract
 		$studentClassId = optional($student->schoolClass)->class_id;
 		$data = self::select('issue_cover_id', 'issue_id', 'comment')
 			->where('student_id', $studentId)
-			->whereHas('issueCoverStatus', function ($query) use ($statuses) {
-				$query->whereIn('status', $statuses);
+			->when($subjectId, function ($query, $subjectId) {
+				return $query->whereHas('issue.teacherSubject', function ($query) use ($subjectId) {
+					$query->where('subject_id', $subjectId);
+				});
+			})
+			->when($statuses, function ($query, $statuses) {
+				return $query->whereHas('issueCoverStatus', function ($query) use ($statuses) {
+					$query->whereIn('status', $statuses);
+				});
 			})
 			->with(
 				'issueCoverStatus',
@@ -96,7 +106,7 @@ class IssueCover extends Model implements AuditableContract
 		return $data;
 	}
 
-	public static function findNotSubmittedByStudentId(string $studentId)
+	public static function findNotSubmittedByStudentId(string $studentId, string $subjectId = null)
 	{
 		$submittedIssueIds = self::where('student_id', $studentId)->pluck('issue_id');
 
@@ -108,6 +118,11 @@ class IssueCover extends Model implements AuditableContract
 
 		$issues = Issue::whereNotIn('issue_id', $submittedIssueIds)
 			->where('private_flag', 0)
+			->when($subjectId, function ($query, $subjectId) {
+				return $query->whereHas('teacherSubject', function ($query) use ($subjectId) {
+					$query->where('subject_id', $subjectId);
+				});
+			})
 			->with(['teacherSubject.subject', 'issueClasses'])
 			->get()
 			->map(function ($issue) use ($studentClassId) {
