@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 class Subject extends Model
 {
@@ -61,5 +62,17 @@ class Subject extends Model
 			->get();
 
 		return $subjects;
+	}
+
+	public static function findSubjectsByStudentId(string $studentId)
+	{
+		return self::whereHas('subjectDepartments', function ($query) use ($studentId) {
+			$query->whereIn(
+				'department_id',
+				Department::whereHas('schoolClasses.students', function ($subQuery) use ($studentId) {
+					$subQuery->where('student_id', $studentId);
+				})->pluck('department_id')
+			);
+		})->get();
 	}
 }

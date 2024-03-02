@@ -40,7 +40,8 @@ class IssueCoverManagementController extends Controller
 	private function validatedSearchIssueCover(Request $request): array
 	{
 		$validatedData = $request->validate([
-			'statuses' => 'required|array',
+			'statuses' => 'sometimes|array',
+			'subject_id' => 'sometimes|string',
 		]);
 		return $validatedData;
 	}
@@ -140,12 +141,19 @@ class IssueCoverManagementController extends Controller
 			$validatedData = $this->validatedSearchIssueCover($request);
 			$studentId = $request->attributes->get('jwt_sub');
 			$issueCovers = IssueCoverResource::collection(
-				IssueCover::findByStatusesAndStudentId($validatedData['statuses'], $studentId)
+				IssueCover::findByStatusesAndStudentIdAndSubjectId(
+					$validatedData['statuses'],
+					$studentId,
+					$validatedData['subject_id'] ?? null
+				)
 			);
 
-			if (in_array('not_submitted', $validatedData['statuses'])) {
+			if (
+				in_array('not_submitted', $validatedData['statuses']) ||
+				(empty($validatedData['statuses']) && !empty($validatedData['subject_id']))
+			) {
 				$notSubmittedIssueCovers = NotSubmittedIssueCoverResource::collection(
-					IssueCover::findNotSubmittedByStudentId($studentId)
+					IssueCover::findNotSubmittedByStudentId($studentId, $validatedData['subject_id'] ?? null)
 				);
 				$issueCovers = $issueCovers->merge($notSubmittedIssueCovers);
 			}

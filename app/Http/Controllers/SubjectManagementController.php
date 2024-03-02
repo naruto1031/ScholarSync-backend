@@ -114,4 +114,12 @@ class SubjectManagementController extends Controller
 		$subjects = Subject::findSubjectListByClassId($classId);
 		return response()->json($subjects);
 	}
+
+	public function getSubjectListByStudentId(Request $request): JsonResponse
+	{
+		$studentId = $request->attributes->get('jwt_sub');
+
+		$subjects = Subject::findSubjectsByStudentId($studentId);
+		return response()->json($subjects);
+	}
 }
